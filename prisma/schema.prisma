@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// prisma/schema.prisma
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  username    String
+  email       String   @unique
+  phoneNumber String?
+  createdAt   DateTime @default(now())
+
+  // 1-to-1 Relation with UserDetails
+  details UserDetails?
+
+  
+}
+
+model UserDetails {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @unique @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  permanentAddress Json? // optional { lat, lng }
+  codeWord         String? // optional secret trigger word
+  message          String  @default("HELP!!") // default SOS message
+
+  trustedFriends TrustedFriend[] // one-to-many
+  sosHistory     SOSAlert[] // one-to-many
+  // 1-to-many relations through UserDetails (optional if you prefer chaining)
+  Media          Media[]
+}
+
+model TrustedFriend {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  userDetailsId String      @db.ObjectId
+  userDetails   UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
+  name          String
+  phone         String
+}
+
+model SOSAlert {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  userDetails   UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
+  userDetailsId String      @db.ObjectId
+  timestamp     DateTime    @default(now())
+  location      Json? // optional { lat, lng }
+  status        String      @default("pending") // "pending" | "sent" | "resolved"
+  media         Media[] // one-to-many
+}
+
+model Media {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  user       UserDetails @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String      @db.ObjectId
+  sosAlert   SOSAlert    @relation(fields: [sosAlertId], references: [id], onDelete: Cascade)
+  sosAlertId String      @db.ObjectId
+  type       MediaType
+  publicId   String
+  url        String
+  format     String
+  duration   Int? // optional
+  width      Int? // optional
+  height     Int? // optional
+  uploadedAt DateTime    @default(now())
+}
+
+enum MediaType {
+  audio
+  video
+  photo
+}
