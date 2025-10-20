@@ -25,8 +25,6 @@ model User {
 
   // 1-to-1 Relation with UserDetails
   details UserDetails?
-
-  
 }
 
 model UserDetails {
@@ -63,19 +61,19 @@ model SOSAlert {
 }
 
 model Media {
-  id         String      @id @default(auto()) @map("_id") @db.ObjectId
-  user       UserDetails @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String      @db.ObjectId
-  sosAlert   SOSAlert    @relation(fields: [sosAlertId], references: [id], onDelete: Cascade)
-  sosAlertId String      @db.ObjectId
-  type       MediaType
-  publicId   String
-  url        String
-  format     String
-  duration   Int? // optional
-  width      Int? // optional
-  height     Int? // optional
-  uploadedAt DateTime    @default(now())
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  user          UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
+  userDetailsId String      @db.ObjectId
+  sosAlert      SOSAlert    @relation(fields: [sosAlertId], references: [id], onDelete: Cascade)
+  sosAlertId    String      @db.ObjectId
+  type          MediaType
+  publicId      String
+  url           String
+  format        String
+  duration      Int? // optional
+  width         Int? // optional
+  height        Int? // optional
+  uploadedAt    DateTime    @default(now())
 }
 
 enum MediaType {
