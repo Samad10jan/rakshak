@@ -31,15 +31,18 @@ model UserDetails {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
   userId String @unique @db.ObjectId
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  permanentAddress Json? // optional { lat, lng }
-  codeWord         String? // optional secret trigger word
-  message          String  @default("HELP!!") // default SOS message
-
-  trustedFriends TrustedFriend[] // one-to-many
-  sosHistory     SOSAlert[] // one-to-many
-  // 1-to-many relations through UserDetails (optional if you prefer chaining)
-  Media          Media[]
+  // optional { lat, lng }
+  permanentAddress Json? 
+  // optional secret trigger word
+  codeWord         String? 
+  // default SOS message
+  message          String  @default("HELP!!") 
+  // one-to-many
+  trustedFriends TrustedFriend[] 
+  // one-to-many
+  sosHistory     SOSAlert[] 
+  // one-to-many relations through UserDetails (optional if you prefer chaining)
+  // Media          Media[]
 }
 
 model TrustedFriend {
@@ -55,15 +58,19 @@ model SOSAlert {
   userDetails   UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
   userDetailsId String      @db.ObjectId
   timestamp     DateTime    @default(now())
-  location      Json? // optional { lat, lng }
-  status        String      @default("pending") // "pending" | "sent" | "resolved"
-  media         Media[] // one-to-many
+  // optional { lat, lng }
+  location      Json? 
+  // "Active" | "Inactive" 
+  status        String      @default("inactive") 
+  // one-to-many
+  media         Media[] 
 }
 
 model Media {
+  
   id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  user          UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
-  userDetailsId String      @db.ObjectId
+  // user          UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
+  // userDetailsId String      @db.ObjectId
   sosAlert      SOSAlert    @relation(fields: [sosAlertId], references: [id], onDelete: Cascade)
   sosAlertId    String      @db.ObjectId
   type          MediaType
