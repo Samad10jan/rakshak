@@ -18,7 +18,7 @@ const apiList = [
   {
     path: "/api/auth/signup",
     method: "POST",
-    desc: "Register a new user account. Creates user with default details (message: 'HELP!!'). Email and username are required, phoneNumber is optional.",
+    desc: "Register a new user account. Creates user with default details (message: 'HELP!!'). Email , username , phoneNumber.",
     body: { email: "abdul@example.com", username: "Abdul", phoneNumber: "9876543210" },
     response: {
       success: true,
