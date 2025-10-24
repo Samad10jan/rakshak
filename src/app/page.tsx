@@ -272,19 +272,22 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-purple-400 via-emerald-400 to-indigo-400 flex items-center justify-center py-8 px-3 sm:px-6">
-      <main className="w-full  max-w-2xl md:max-w-4xl bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg border border-white/30 p-5 sm:p-8">
+    <div className="min-h-screen  bg-gradient-to-r from-purple-400 via-emerald-400 to-indigo-400 flex items-center justify-center py-8 px-3 sm:px-6">
+      <main className="w-full max-w-2xl md:max-w-4xl bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg border border-white/30 p-5 sm:p-8 ">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-extrabold mb-2 text-gray-800 tracking-tight">
-            RAKSHAK API
-          </h1>
-          <p className="text-gray-700 text-sm sm:text-base leading-relaxed max-w-md mx-auto">
-            Complete API documentation for managing SOS alerts, trusted contacts, and emergency media.
-          </p>
-          <div className="mt-4 bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200 inline-block">
-            <span className="text-xs sm:text-sm text-gray-600">Base URL: </span>
-            <code className="text-xs sm:text-sm font-mono font-semibold text-blue-700 break-all text-nowrap">
+        <div className="text-center mb-8 flex flex-col items-center">
+          <div>
+
+            <h1 className="text-3xl sm:text-4xl font-extrabold mb-2 text-gray-800">
+              RAKSHAK API
+            </h1>
+            <p className="text-gray-700 text-sm sm:text-base  max-w-md mx-auto">
+              Complete API documentation for managing SOS alerts, trusted contacts, and emergency media.
+            </p>
+          </div>
+          <div className="mt-4 bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200 w-fit ">
+            <p className="text-xs sm:text-sm text-gray-600">Base URL: </p>
+            <code className="text-xs md:text-sm font-mono font-semibold text-blue-700 ">
               {API_BASE}
             </code>
           </div>
