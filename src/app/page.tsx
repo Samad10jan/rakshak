@@ -12,23 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const API_BASE = "https://rakshak-gamma.vercel.app/api/";
+const ACCESS_CODE = "P20Rakshak";
 
-interface ApiError {
-  status: number;
-  message: string;
-}
-
-interface ApiRoute {
-  path: string;
-  method: string;
-  desc: string;
-  body?: Record<string, any>;
-  response?: Record<string, any> | Array<any>;
-  errors?: ApiError[];
-  implemented: boolean;
-}
-
-const apiList: ApiRoute[] = [
+const apiList = [
   {
     path: "/api/auth/signup",
     method: "POST",
@@ -167,6 +153,16 @@ const apiList: ApiRoute[] = [
   },
 ];
 
+interface ApiEndpoint {
+  path: string;
+  method: string;
+  desc: string;
+  body?: Record<string, any>;
+  response: Record<string, any>;
+  implemented: boolean;
+  errors?: Array<{ status: number; message: string }>;
+}
+
 const methodColors: Record<string, string> = {
   GET: "bg-green-100 text-green-700",
   POST: "bg-blue-100 text-blue-700",
@@ -174,16 +170,12 @@ const methodColors: Record<string, string> = {
   DELETE: "bg-red-100 text-red-700",
 };
 
-interface TestApiPanelProps {
-  selected: ApiRoute | null;
-}
-
-function TestApiPanel({ selected }: TestApiPanelProps) {
-  const [endpoint, setEndpoint] = useState<string>(selected?.path || "/api/auth/signup");
-  const [method, setMethod] = useState<string>(selected?.method.split(", ")[0] || "POST");
-  const [body, setBody] = useState<string>(JSON.stringify(selected?.body || {}, null, 2));
-  const [response, setResponse] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+function TestApiPanel({ selected }: { selected: ApiEndpoint | null }) {
+  const [endpoint, setEndpoint] = useState(selected?.path || "/api/auth/signup");
+  const [method, setMethod] = useState(selected?.method.split(", ")[0] || "POST");
+  const [body, setBody] = useState(JSON.stringify(selected?.body || {}, null, 2));
+  const [response, setResponse] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleSend = async () => {
     setLoading(true);
@@ -210,20 +202,23 @@ function TestApiPanel({ selected }: TestApiPanelProps) {
         <div>
           <label className="block text-sm font-medium mb-1.5 text-gray-700">Endpoint</label>
           <input
-            title="Endpoints"
             className="w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 font-mono text-sm"
             value={endpoint}
             onChange={(e) => setEndpoint(e.target.value)}
+            aria-label="API Endpoint"
+            placeholder="Enter API endpoint"
+            title="API Endpoint input"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-1.5 text-gray-700">Method</label>
           <select
-            title="Method"
             className="w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500"
             value={method}
             onChange={(e) => setMethod(e.target.value)}
+            title="HTTP Method"
+            aria-label="Select HTTP Method"
           >
             <option>GET</option>
             <option>POST</option>
@@ -266,116 +261,119 @@ function TestApiPanel({ selected }: TestApiPanelProps) {
 }
 
 export default function Home() {
-  const [selected, setSelected] = useState<ApiRoute | null>(null);
+  const [selected, setSelected] = useState<ApiEndpoint | null>(null);
   const [code, setCode] = useState("");
-  const [textApiPanel, setTestApiPanel] = useState(false)
-  // console.log(code);
-  
-  function handleCode() {
-    if (code ==="P20Rakshak") {
-      setTestApiPanel(!textApiPanel)
-      console.log("code ok");
-      
-      return
-    }
-    console.log(code);
-    
-    return
-  }
+  const [showTestPanel, setShowTestPanel] = useState(false);
 
+  const handleCodeSubmit = () => {
+    if (code === ACCESS_CODE) {
+      setShowTestPanel(true);
+    }
+  };
 
   return (
-    <div className="min-h-screen p-6 sm:p-10 bg-gradient-to-r from-purple-400 to-indigo-400 ">
-      <main className="max-w-4xl mx-auto flex flex-col items-center">
-        <div className="text-center mb-10">
-          <h1 className="text-5xl font-extrabold mb-3">
+    <div className="min-h-screen bg-gradient-to-r from-purple-400 via-emerald-400 to-indigo-400 flex items-center justify-center py-8 px-3 sm:px-6">
+      <main className="w-full  max-w-2xl md:max-w-4xl bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg border border-white/30 p-5 sm:p-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl sm:text-4xl font-extrabold mb-2 text-gray-800 tracking-tight">
             RAKSHAK API
           </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Complete API documentation for managing SOS alerts, trusted contacts, and emergency media
+          <p className="text-gray-700 text-sm sm:text-base leading-relaxed max-w-md mx-auto">
+            Complete API documentation for managing SOS alerts, trusted contacts, and emergency media.
           </p>
-          <div className="mt-4 inline-block bg-white px-4 py-2 rounded-lg shadow-sm border">
-            <span className="text-sm text-gray-600">Base URL: </span>
-            <code className="text-sm font-mono font-semibold text-blue-600">{API_BASE}</code>
+          <div className="mt-4 bg-white px-3 py-2 rounded-lg shadow-sm border border-gray-200 inline-block">
+            <span className="text-xs sm:text-sm text-gray-600">Base URL: </span>
+            <code className="text-xs sm:text-sm font-mono font-semibold text-blue-700 break-all text-nowrap">
+              {API_BASE}
+            </code>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 ">
-          <div className="space-y-4 ">
-            <h2 className="text-2xl font-bold mb-4">API Endpoints</h2>
-            <Accordion type="single" collapsible className="space-y-2">
-              {apiList.map((api, i) => (
-                <AccordionItem
-                  key={i}
-                  value={`item-${i}`}
-                  className="border rounded-lg bg-white shadow-sm hover:shadow-md transition"
+        {/* API Section */}
+        <div>
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-800 text-center sm:text-left">
+            API Endpoints
+          </h2>
+
+          <Accordion type="single" collapsible className="space-y-3">
+            {apiList.map((api, i) => (
+              <AccordionItem
+                key={i}
+                value={`item-${i}`}
+                className="border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow"
+              >
+                <AccordionTrigger
+                  onClick={() => setSelected(api)}
+                  className="px-2 "
                 >
-                  <AccordionTrigger onClick={() => setSelected(api)} className="px-4 hover:no-underline">
-                    <div className="flex items-center justify-between w-full text-left gap-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm font-medium">{api.path}</span>
+                  <div className="flex justify-between flex-col md:flex-row w-full ">
 
-                      </div>
-                      <span className={`text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap ${methodColors[api.method.split(",")[0].trim()]}`}>
-                        {api.method}
-                      </span>
+                    <p className="font-mono text-xs text-gray-800">{api.path}</p>
+                    <p
+                      className={`text-[10px]  md:text-xs px-2 py-0.5 rounded-full font-semibold  ${methodColors[api.method.split(",")[0].trim()]}`}
+                    >
+                      {api.method}
+                    </p>
+                  </div>
+                </AccordionTrigger>
+
+                <AccordionContent className="px-4 pb-4">
+                  {!api.implemented && (
+                    <div className="bg-yellow-50 border border-yellow-200 p-2 rounded-lg mb-3">
+                      <p className="text-xs text-yellow-800 font-medium">
+                        ⚠️ This endpoint is not yet implemented
+                      </p>
                     </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
-                    {!api.implemented && (
-                      <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg mb-3">
-                        <p className="text-sm text-yellow-800 font-medium">⚠️ This endpoint is not yet implemented</p>
-                      </div>
-                    )}
-                    <p className="text-sm text-gray-600 mb-3">{api.desc}</p>
+                  )}
 
-                    {api.body && (
-                      <div className="mb-3">
-                        <p className="text-xs font-semibold text-gray-700 mb-1">Request Body:</p>
-                        <pre className="bg-gray-50 text-gray-800 p-3 rounded-md text-xs font-mono overflow-auto border">
-                          {JSON.stringify(api.body, null, 2)}
-                        </pre>
-                      </div>
-                    )}
-                    {api.response && (
-                      <div className="mb-3">
-                        <p className="text-xs font-semibold text-gray-700 mb-1">Success Response (201):</p>
-                        <pre className="bg-gray-900 text-green-400 p-3 rounded-md text-xs font-mono overflow-auto">
-                          {JSON.stringify(api.response, null, 2)}
-                        </pre>
-                      </div>
-                    )}
-                    {api.errors && (
-                      <div>
-                        <p className="text-xs font-semibold text-gray-700 mb-1">Possible Errors:</p>
-                        <div className="space-y-1">
-                          {api.errors.map((err, idx) => (
-                            <div key={idx} className="bg-red-50 border border-red-200 p-2 rounded text-xs">
-                              <span className="font-semibold text-red-700">{err.status}:</span>{" "}
-                              <span className="text-red-600">{err.message}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
+                  <p className="text-xs sm:text-sm text-gray-700 mb-3">{api.desc}</p>
 
-          <div className="mt-12 h-fit">
-            {
-              textApiPanel ?
-                <TestApiPanel selected={selected} /> :
-                <div className="flex flex-col items-center gap-4 ">
-                  <Input className="bg-white/50" title="code" type="password" value={code} maxLength={10} onChange={(e) => { setCode(e.target.value) }} placeholder="Enter Code" />
-                  <Button title="submit" onClick={handleCode} > Submit </Button>
-                </div>
-            }
+                  {api.body && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-gray-700 mb-1">Request Body:</p>
+                      <pre className="bg-gray-50 text-gray-800 p-3 rounded-md text-[10px] sm:text-xs font-mono overflow-auto border border-gray-200">
+                        {JSON.stringify(api.body, null, 2)}
+                      </pre>
+                    </div>
+                  )}
 
+                  {api.response && (
+                    <div className="mb-3">
+                      <p className="text-xs font-semibold text-gray-700 mb-1">Success Response:</p>
+                      <pre className="bg-gray-900 text-green-400 p-3 rounded-md text-[10px] sm:text-xs font-mono overflow-auto">
+                        {JSON.stringify(api.response, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
 
-          </div>
+        {/* Access/Test Panel */}
+        <div className="mt-10 flex justify-center">
+          {showTestPanel ? (
+            <div className="w-full sm:w-3/4">
+              <TestApiPanel selected={selected} />
+            </div>
+          ) : (
+            <div className="bg-white/80 border border-gray-200 rounded-xl shadow-lg p-5 w-full max-w-xs flex flex-col items-center gap-3">
+              <h3 className="text-base font-semibold text-gray-700">🔒 Access Test Panel</h3>
+              <Input
+                className="bg-gray-50 border-gray-300 focus:ring-2 focus:ring-blue-400 text-sm"
+                type="password"
+                value={code}
+                maxLength={10}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Enter Access Code"
+              />
+              <Button onClick={handleCodeSubmit} className="w-full text-sm">
+                Submit
+              </Button>
+            </div>
+          )}
         </div>
       </main>
     </div>
