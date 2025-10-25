@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { phoneNumber: body.phoneNumber },
       include:{
-        details:{include:{trustedFriends:true}}
+        details:true
       }
     });
 

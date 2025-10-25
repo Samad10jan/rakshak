@@ -19,8 +19,8 @@ datasource db {
 model User {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   username    String
-  email       String?   @unique
-  phoneNumber String  @unique
+  email       String?  @unique
+  phoneNumber String   @unique
   createdAt   DateTime @default(now())
 
   // 1-to-1 Relation with UserDetails
@@ -50,7 +50,7 @@ model TrustedFriend {
   userDetailsId String      @db.ObjectId
   userDetails   UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
   name          String
-  phone         String
+  phone   String      @unique
 }
 
 model SOSAlert {

@@ -6,19 +6,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     try {
         const param = await params;
         const { id } = param
+        // console.log(id);
+        
 
 
         const user = await prisma.user.findUnique({
             where: { id },
-            include: {
-                details: {
-                    include: {
-                        trustedFriends: true,
-                        sosHistory: true,
-                    },
-                },
-            },
+            
         });
+        // console.log(user);
+        
 
         if (!user) {
             return NextResponse.json(
@@ -45,11 +42,11 @@ export async function PUT(
         const { id } = param;
 
         const body = await req.json();
-        const { username, email, phoneNumber } = body;
+        const { username, email} = body;
 
         const updatedUser = await prisma.user.update({
             where: { id },
-            data: { username, email, phoneNumber },
+            data: { username, email },
         });
 
         return NextResponse.json({

@@ -163,11 +163,18 @@ const apiList = [
       success: true,
       message: "User registered successfully",
       user: {
-        id: "user123",
-        email: "abdul@example.com",
-        username: "Abdul",
-        phoneNumber: "9876543210",
-        details: { id: "details123", message: "HELP!!", userId: "user123" }
+        id: "68fcc70c132244eaf83b68b0",
+        username: "ABD",
+        email: "abd@gmail.com",
+        phoneNumber: "9827453783",
+        createdAt: "2025-10-25T12:48:12.732Z",
+        details: {
+          id: "68fcc70c132244eaf83b68b1",
+          userId: "68fcc70c132244eaf83b68b0",
+          permanentAddress: null,
+          codeWord: null,
+          message: "HELP !! "
+        }
       }
     },
     implemented: true
@@ -175,21 +182,20 @@ const apiList = [
   {
     path: "/api/auth/signin",
     method: "POST",
-    desc: "Sign in an existing user by email. Returns user with all linked details.",
-    body: { phoneNumber: "9867896723" },
+    desc: "Sign in an existing user by phoneNumber. Returns user with all linked details.",
+    body: { phoneNumber: "986789XXXX" },
     response: {
-      success: true,
-      message: "Sign-in successful",
+      success: true, message: "Sign-in successful",
       user: {
-        id: "user123",
-        email: "abdul@example.com",
+        id: "68f857a510de027a2ec301e9", 
         username: "Abdul",
-        phoneNumber: "9876543210",
-        details: {
-          id: "details123",
-          message: "HELP!!",
-          codeWord: "Rakshak",
-          permanentAddress: { lat: 12.92, lng: 77.61 }
+        email: "abdulsamad@gmail.com", 
+        phoneNumber: "9827453733",
+         createdAt: "2025-10-22T04:03:49.653Z", 
+         details:
+        {
+          id: "68f857a510de027a2ec301ea", userId: "68f857a510de027a2ec301e9", permanentAddress: {lat:"...",lng:"..."}, "codeWord": "Not ok",
+          message: "HELP!"
         }
       }
     },
@@ -200,16 +206,16 @@ const apiList = [
   {
     path: "/api/user/[id]",
     method: "GET, PUT, DELETE",
-    desc: "Fetch, update, or delete a user by ID. Includes linked details, friends, and SOS alerts.",
-    body: { username: "Updated Name", email: "updated@example.com", phoneNumber: "9871234567" },
+    desc: "Fetch, update, or delete a user by ID. Includes linked details, friends, and SOS alerts. PUT Example Below,for GET and DELETE no body",
+    body: { username: "Updated Name", email: "updated@example.com" },
     response: {
       success: true,
-      message: "User fetched successfully",
+      message: "User details updated successfully",
       user: {
         id: "abc123",
         username: "Abdul Updated",
         email: "updated@example.com",
-        details: { id: "details123", message: "HELP!!" }
+        details: { id: "67a99day987d9a", message: "HELP!!" }
       }
     },
     implemented: true
@@ -243,11 +249,11 @@ const apiList = [
     path: "/api/user/[id]/trusted-friends",
     method: "GET, POST",
     desc: "Get or add trusted friends for a user. Each friend has a name and phone number.",
-    body: { name: "Ali", phoneNumber: "9876543211" },
+    body: { name: "Ali", phone: "9876543211" },
     response: {
       success: true,
       message: "Friend added successfully",
-      friend: { id: "friend123", name: "Ali", phoneNumber: "9876543211" }
+      friend: { id: "8s7d09as8d0a9",userDetailsId:"68f857a510de027a2ec301ea", name: "Ali", phone: "9876543211" }
     },
     implemented: true
   },
@@ -255,11 +261,11 @@ const apiList = [
     path: "/api/user/[id]/trusted-friends/[friendId]",
     method: "PUT, DELETE",
     desc: "Edit or delete a specific trusted friend.",
-    body: { name: "Updated Friend", phoneNumber: "9998887776" },
+    body: { name: "Updated Friend", phone: "9998887776" },
     response: {
       success: true,
       message: "Friend updated successfully",
-      friend: { id: "friend123", name: "Updated Friend", phoneNumber: "9998887776" }
+      friend: { id: "786s7dasbas7as", name: "Updated Friend", phone: "9998887776" }
     },
     implemented: true
   },
@@ -270,10 +276,10 @@ const apiList = [
     method: "GET",
     desc: "Fetch all user media through related SOS alerts.",
     response: [
-      { id: "m1", type: "photo", url: "https://cloudinary.com/photo1.jpg" },
-      { id: "m2", type: "video", url: "https://cloudinary.com/video.mp4" }
+      { id: "890ddidjk..", type: "photo", url: "https://cloudinary.com/photo1.jpg" },
+      { id: "989sadasdkn..", type: "video", url: "https://cloudinary.com/video.mp4" }
     ],
-    implemented: true
+    implemented: false
   },
 
   // 🚨 SOS ALERTS
@@ -287,7 +293,7 @@ const apiList = [
       message: "SOS alert created successfully",
       alert: { id: "sos123", status: "active", createdAt: "2025-10-25T12:00Z" }
     },
-    implemented: true
+    implemented: false
   },
   {
     path: "/api/sos-alert/[id]",
@@ -295,7 +301,7 @@ const apiList = [
     desc: "Get, update, or delete a specific SOS alert.",
     body: { status: "inactive" },
     response: { success: true, message: "SOS alert updated successfully" },
-    implemented: true
+    implemented: false
   },
   {
     path: "/api/sos-alert/user/[userId]",
@@ -305,7 +311,7 @@ const apiList = [
       { id: "sos1", status: "active", createdAt: "2025-10-20T12:00Z" },
       { id: "sos2", status: "inactive", createdAt: "2025-10-22T14:00Z" }
     ],
-    implemented: true
+    implemented: false
   },
 
   // 🗂️ MEDIA MANAGEMENT
@@ -321,14 +327,14 @@ const apiList = [
       format: "jpg"
     },
     response: { success: true, message: "Media uploaded successfully" },
-    implemented: true
+    implemented: false
   },
   {
     path: "/api/media/[id]",
     method: "GET, DELETE",
     desc: "Fetch or delete specific media using its ID.",
     response: { success: true, message: "Media deleted successfully" },
-    implemented: true
+    implemented: false
   },
 
   // 💓 HEALTH CHECK
@@ -337,7 +343,7 @@ const apiList = [
     method: "GET",
     desc: "Check API uptime and health status.",
     response: { status: "ok", uptime: "2500s", timestamp: "2025-10-25T14:00Z" },
-    implemented: true
+    implemented: false
   }
 ];
 

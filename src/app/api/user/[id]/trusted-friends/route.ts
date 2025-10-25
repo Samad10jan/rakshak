@@ -8,12 +8,14 @@ export async function GET(
     try {
         const param = await params;
         const { id } = param
-
+        // console.log(id);
 
         const userDetails = await prisma.userDetails.findUnique({
             where: { userId: id },
-            include: { trustedFriends: true },
-        });
+            include: { trustedFriends: true }
+        })
+        // console.log(userDetails);
+
 
         if (!userDetails) {
             return NextResponse.json(
@@ -24,6 +26,7 @@ export async function GET(
 
         return NextResponse.json({
             success: true,
+            message: "User details fetched",
             friends: userDetails.trustedFriends,
         });
     } catch (error: any) {
