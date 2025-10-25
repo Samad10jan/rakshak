@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const user = await prisma.user.findUnique({
-      where: { email: body.email },
+      where: { phoneNumber: body.phoneNumber },
     });
 
     if (!user) {
@@ -15,10 +15,6 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
     }
-
-    // if (user.password !== body.password) {
-    //   return NextResponse.json({ success: false, message: "Invalid password" }, { status: 401 });
-    // }
 
     return NextResponse.json(
       { success: true, message: "Sign-in successful", user },

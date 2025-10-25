@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     const { username, email, phoneNumber } = body;
 
     // Server-Side Validation
-    if (!email || email.trim().length === 0) {
+    if (!phoneNumber || phoneNumber.trim().length === 0) {
       return NextResponse.json(
         { success: false, message: "Email is required" },
         { status: 400 }
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { phoneNumber },
     });
 
     if (existingUser) {

@@ -19,8 +19,8 @@ datasource db {
 model User {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   username    String
-  email       String   @unique
-  phoneNumber String?
+  email       String?   @unique
+  phoneNumber String  @unique
   createdAt   DateTime @default(now())
 
   // 1-to-1 Relation with UserDetails
@@ -28,19 +28,19 @@ model User {
 }
 
 model UserDetails {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  userId String @unique @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String          @unique @db.ObjectId
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   // optional { lat, lng }
-  permanentAddress Json? 
+  permanentAddress Json?
   // optional secret trigger word
-  codeWord         String? 
+  codeWord         String?
   // default SOS message
-  message          String  @default("HELP!!") 
+  message          String          @default("HELP!!")
   // one-to-many
-  trustedFriends TrustedFriend[] 
+  trustedFriends   TrustedFriend[]
   // one-to-many
-  sosHistory     SOSAlert[] 
+  sosHistory       SOSAlert[]
   // one-to-many relations through UserDetails (optional if you prefer chaining)
   // Media          Media[]
 }
@@ -59,28 +59,27 @@ model SOSAlert {
   userDetailsId String      @db.ObjectId
   timestamp     DateTime    @default(now())
   // optional { lat, lng }
-  location      Json? 
+  location      Json?
   // "Active" | "Inactive" 
-  status        String      @default("inactive") 
+  status        String      @default("inactive")
   // one-to-many
-  media         Media[] 
+  media         Media[]
 }
 
 model Media {
-  
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
   // user          UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
   // userDetailsId String      @db.ObjectId
-  sosAlert      SOSAlert    @relation(fields: [sosAlertId], references: [id], onDelete: Cascade)
-  sosAlertId    String      @db.ObjectId
-  type          MediaType
-  publicId      String
-  url           String
-  format        String
-  duration      Int? // optional
-  width         Int? // optional
-  height        Int? // optional
-  uploadedAt    DateTime    @default(now())
+  sosAlert   SOSAlert  @relation(fields: [sosAlertId], references: [id], onDelete: Cascade)
+  sosAlertId String    @db.ObjectId
+  type       MediaType
+  publicId   String
+  url        String
+  format     String
+  duration   Int? // optional
+  width      Int? // optional
+  height     Int? // optional
+  uploadedAt DateTime  @default(now())
 }
 
 enum MediaType {

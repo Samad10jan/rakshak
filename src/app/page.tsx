@@ -14,11 +14,150 @@ import { Input } from "@/components/ui/input";
 const API_BASE = "https://rakshak-gamma.vercel.app/api/";
 const ACCESS_CODE = "P20Rakshak";
 
+// const apiList = [
+//   {
+//     path: "/api/auth/signup",
+//     method: "POST",
+//     desc: "Register a new user account. Creates user with default details (message: 'HELP!!'). Email , username , phoneNumber.",
+//     body: { email: "abdul@example.com", username: "Abdul", phoneNumber: "9876543210" },
+//     response: {
+//       success: true,
+//       message: "User registered successfully",
+//       user: {
+//         id: "user123",
+//         email: "abdul@example.com",
+//         username: "Abdul",
+//         phoneNumber: "9876543210",
+//         details: { id: "details123", message: "HELP!!", userId: "user123" }
+//       }
+//     },
+//     errors: [
+//       { status: 400, message: "Email is required" },
+//       { status: 400, message: "Username is required" },
+//       { status: 409, message: "User already exists" },
+//       { status: 500, message: "Error creating user" }
+//     ],
+//     implemented: true
+//   },
+//   {
+//     path: "/api/auth/signin",
+//     method: "POST",
+//     desc: "Sign in existing user by email. No password required (authentication disabled). Returns full user object with details.",
+//     body: { email: "abdul@example.com" },
+//     response: {
+//       success: true,
+//       message: "Sign-in successful",
+//       user: {
+//         id: "user123",
+//         email: "abdul@example.com",
+//         username: "Abdul",
+//         phoneNumber: "9876543210",
+//         createdAt: "2025-10-20T12:00:00Z"
+//       }
+//     },
+//     errors: [
+//       { status: 404, message: "User does not exist" },
+//       { status: 500, message: "Error during sign-in" }
+//     ],
+//     implemented: true
+//   },
+//   {
+//     path: "/api/user/[id]",
+//     method: "GET, PUT, DELETE",
+//     desc: "Fetch, update or delete user by ID",
+//     body: { username: "Updated Name", phoneNumber: "9871234567" },
+//     response: { id: "abc123", email: "abdul@example.com" },
+//     implemented: false
+//   },
+//   {
+//     path: "/api/user/[id]/details",
+//     method: "GET, PUT",
+//     desc: "Get or edit user details (message, codeword, address, etc.)",
+//     body: { message: "HELP ME!", codeWord: "Rakshak", permanentAddress: { lat: 12.9, lng: 77.6 } },
+//     response: { success: true, message: "Details updated successfully" },
+//     implemented: false
+//   },
+//   {
+//     path: "/api/user/[id]/trusted-friends",
+//     method: "GET, POST",
+//     desc: "List or add trusted friends",
+//     body: { name: "Ali", phone: "9876543211" },
+//     response: { success: true, message: "Friend added" },
+//     implemented: false
+//   },
+//   {
+//     path: "/api/user/[id]/trusted-friends/[friendId]",
+//     method: "PUT, DELETE",
+//     desc: "Edit or remove a trusted friend",
+//     body: { name: "Updated Friend", phone: "9998887776" },
+//     response: { success: true, message: "Friend updated" },
+//     implemented: false
+//   },
+//   {
+//     path: "/api/user/[id]/media",
+//     method: "GET",
+//     desc: "Fetch all user media (through SOS alerts)",
+//     response: [{ type: "photo", url: "https://..." }, { type: "video", url: "https://..." }],
+//     implemented: false
+//   },
+//   {
+//     path: "/api/sos-alert/create",
+//     method: "POST",
+//     desc: "Create a new SOS alert (with location, etc.)",
+//     body: { userDetailsId: "66eabc...", location: { lat: 12.92, lng: 77.62 } },
+//     response: { success: true, message: "SOS alert created" },
+//     implemented: false
+//   },
+//   {
+//     path: "/api/sos-alert/[id]",
+//     method: "GET, PUT, DELETE",
+//     desc: "Manage specific SOS alert",
+//     body: { status: "inactive" },
+//     response: { success: true, message: "SOS alert updated" },
+//     implemented: false
+//   },
+//   {
+//     path: "/api/sos-alert/user/[userId]",
+//     method: "GET",
+//     desc: "Get all SOS alerts for a user",
+//     response: [{ id: "abc", status: "active", timestamp: "2025-10-20T12:00Z" }],
+//     implemented: false
+//   },
+//   {
+//     path: "/api/media/upload",
+//     method: "POST",
+//     desc: "Upload media (image/video/audio)",
+//     body: {
+//       sosAlertId: "66eabc...",
+//       type: "photo",
+//       url: "https://res.cloudinary.com/example/photo.jpg",
+//       publicId: "cloudinary123",
+//       format: "jpg",
+//     },
+//     response: { success: true, message: "Media uploaded" },
+//     implemented: false
+//   },
+//   {
+//     path: "/api/media/[id]",
+//     method: "GET, DELETE",
+//     desc: "Get or delete a specific media file",
+//     response: { success: true, message: "Media deleted" },
+//     implemented: false
+//   },
+//   {
+//     path: "/api/health",
+//     method: "GET",
+//     desc: "Check API health status",
+//     response: { status: "ok", uptime: "1240s" },
+//     implemented: false
+//   },
+// ];
 const apiList = [
+  // 🔐 AUTH
   {
     path: "/api/auth/signup",
     method: "POST",
-    desc: "Register a new user account. Creates user with default details (message: 'HELP!!'). Email , username , phoneNumber.",
+    desc: "Register a new user account. Creates user with default details (message: 'HELP!!'). Required fields: email, username, phoneNumber.",
     body: { email: "abdul@example.com", username: "Abdul", phoneNumber: "9876543210" },
     response: {
       success: true,
@@ -31,19 +170,13 @@ const apiList = [
         details: { id: "details123", message: "HELP!!", userId: "user123" }
       }
     },
-    errors: [
-      { status: 400, message: "Email is required" },
-      { status: 400, message: "Username is required" },
-      { status: 409, message: "User already exists" },
-      { status: 500, message: "Error creating user" }
-    ],
     implemented: true
   },
   {
     path: "/api/auth/signin",
     method: "POST",
-    desc: "Sign in existing user by email. No password required (authentication disabled). Returns full user object with details.",
-    body: { email: "abdul@example.com" },
+    desc: "Sign in an existing user by email. Returns user with all linked details.",
+    body: { phoneNumber: "9867896723" },
     response: {
       success: true,
       message: "Sign-in successful",
@@ -52,105 +185,160 @@ const apiList = [
         email: "abdul@example.com",
         username: "Abdul",
         phoneNumber: "9876543210",
-        createdAt: "2025-10-20T12:00:00Z"
+        details: {
+          id: "details123",
+          message: "HELP!!",
+          codeWord: "Rakshak",
+          permanentAddress: { lat: 12.92, lng: 77.61 }
+        }
       }
     },
-    errors: [
-      { status: 404, message: "User does not exist" },
-      { status: 500, message: "Error during sign-in" }
-    ],
     implemented: true
   },
+
+  // 👤 USER CORE
   {
     path: "/api/user/[id]",
     method: "GET, PUT, DELETE",
-    desc: "Fetch, update or delete user by ID",
-    body: { username: "Updated Name", phoneNumber: "9871234567" },
-    response: { id: "abc123", email: "abdul@example.com" },
-    implemented: false
+    desc: "Fetch, update, or delete a user by ID. Includes linked details, friends, and SOS alerts.",
+    body: { username: "Updated Name", email: "updated@example.com", phoneNumber: "9871234567" },
+    response: {
+      success: true,
+      message: "User fetched successfully",
+      user: {
+        id: "abc123",
+        username: "Abdul Updated",
+        email: "updated@example.com",
+        details: { id: "details123", message: "HELP!!" }
+      }
+    },
+    implemented: true
   },
+
+  // 🧩 USER DETAILS
   {
     path: "/api/user/[id]/details",
     method: "GET, PUT",
-    desc: "Get or edit user details (message, codeword, address, etc.)",
-    body: { message: "HELP ME!", codeWord: "Rakshak", permanentAddress: { lat: 12.9, lng: 77.6 } },
-    response: { success: true, message: "Details updated successfully" },
-    implemented: false
+    desc: "Fetch or update user details. Includes address, codeWord, message, and SOS/friends data.",
+    body: {
+      permanentAddress: { lat: 12.9, lng: 77.6 },
+      codeWord: "SafeHome",
+      message: "I am in danger, please help!"
+    },
+    response: {
+      success: true,
+      message: "User details updated successfully",
+      details: {
+        id: "details123",
+        permanentAddress: { lat: 12.9, lng: 77.6 },
+        codeWord: "SafeHome",
+        message: "I am in danger, please help!"
+      }
+    },
+    implemented: true
   },
+
+  // 🤝 TRUSTED FRIENDS
   {
     path: "/api/user/[id]/trusted-friends",
     method: "GET, POST",
-    desc: "List or add trusted friends",
-    body: { name: "Ali", phone: "9876543211" },
-    response: { success: true, message: "Friend added" },
-    implemented: false
+    desc: "Get or add trusted friends for a user. Each friend has a name and phone number.",
+    body: { name: "Ali", phoneNumber: "9876543211" },
+    response: {
+      success: true,
+      message: "Friend added successfully",
+      friend: { id: "friend123", name: "Ali", phoneNumber: "9876543211" }
+    },
+    implemented: true
   },
   {
     path: "/api/user/[id]/trusted-friends/[friendId]",
     method: "PUT, DELETE",
-    desc: "Edit or remove a trusted friend",
-    body: { name: "Updated Friend", phone: "9998887776" },
-    response: { success: true, message: "Friend updated" },
-    implemented: false
+    desc: "Edit or delete a specific trusted friend.",
+    body: { name: "Updated Friend", phoneNumber: "9998887776" },
+    response: {
+      success: true,
+      message: "Friend updated successfully",
+      friend: { id: "friend123", name: "Updated Friend", phoneNumber: "9998887776" }
+    },
+    implemented: true
   },
+
+  // 📸 MEDIA
   {
     path: "/api/user/[id]/media",
     method: "GET",
-    desc: "Fetch all user media (through SOS alerts)",
-    response: [{ type: "photo", url: "https://..." }, { type: "video", url: "https://..." }],
-    implemented: false
+    desc: "Fetch all user media through related SOS alerts.",
+    response: [
+      { id: "m1", type: "photo", url: "https://cloudinary.com/photo1.jpg" },
+      { id: "m2", type: "video", url: "https://cloudinary.com/video.mp4" }
+    ],
+    implemented: true
   },
+
+  // 🚨 SOS ALERTS
   {
     path: "/api/sos-alert/create",
     method: "POST",
-    desc: "Create a new SOS alert (with location, etc.)",
+    desc: "Create a new SOS alert with location coordinates linked to userDetailsId.",
     body: { userDetailsId: "66eabc...", location: { lat: 12.92, lng: 77.62 } },
-    response: { success: true, message: "SOS alert created" },
-    implemented: false
+    response: {
+      success: true,
+      message: "SOS alert created successfully",
+      alert: { id: "sos123", status: "active", createdAt: "2025-10-25T12:00Z" }
+    },
+    implemented: true
   },
   {
     path: "/api/sos-alert/[id]",
     method: "GET, PUT, DELETE",
-    desc: "Manage specific SOS alert",
+    desc: "Get, update, or delete a specific SOS alert.",
     body: { status: "inactive" },
-    response: { success: true, message: "SOS alert updated" },
-    implemented: false
+    response: { success: true, message: "SOS alert updated successfully" },
+    implemented: true
   },
   {
     path: "/api/sos-alert/user/[userId]",
     method: "GET",
-    desc: "Get all SOS alerts for a user",
-    response: [{ id: "abc", status: "active", timestamp: "2025-10-20T12:00Z" }],
-    implemented: false
+    desc: "Fetch all SOS alerts belonging to a specific user.",
+    response: [
+      { id: "sos1", status: "active", createdAt: "2025-10-20T12:00Z" },
+      { id: "sos2", status: "inactive", createdAt: "2025-10-22T14:00Z" }
+    ],
+    implemented: true
   },
+
+  // 🗂️ MEDIA MANAGEMENT
   {
     path: "/api/media/upload",
     method: "POST",
-    desc: "Upload media (image/video/audio)",
+    desc: "Upload a media file (photo, video, or audio) linked to an SOS alert.",
     body: {
-      sosAlertId: "66eabc...",
+      sosAlertId: "sos123",
       type: "photo",
-      url: "https://res.cloudinary.com/example/photo.jpg",
-      publicId: "cloudinary123",
-      format: "jpg",
+      url: "https://res.cloudinary.com/rakshak/photo.jpg",
+      publicId: "cloudinary_abc",
+      format: "jpg"
     },
-    response: { success: true, message: "Media uploaded" },
-    implemented: false
+    response: { success: true, message: "Media uploaded successfully" },
+    implemented: true
   },
   {
     path: "/api/media/[id]",
     method: "GET, DELETE",
-    desc: "Get or delete a specific media file",
-    response: { success: true, message: "Media deleted" },
-    implemented: false
+    desc: "Fetch or delete specific media using its ID.",
+    response: { success: true, message: "Media deleted successfully" },
+    implemented: true
   },
+
+  // 💓 HEALTH CHECK
   {
     path: "/api/health",
     method: "GET",
-    desc: "Check API health status",
-    response: { status: "ok", uptime: "1240s" },
-    implemented: false
-  },
+    desc: "Check API uptime and health status.",
+    response: { status: "ok", uptime: "2500s", timestamp: "2025-10-25T14:00Z" },
+    implemented: true
+  }
 ];
 
 interface ApiEndpoint {
