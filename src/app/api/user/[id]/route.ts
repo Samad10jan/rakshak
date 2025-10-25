@@ -38,11 +38,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // ✅ PUT update user info
 export async function PUT(
-    req: NextRequest,
-    { params }: { params: { id: string } }
+    req: NextRequest, { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const param = await params;
+        const { id } = param;
+        
         const body = await req.json();
         const { username, email, phoneNumber } = body;
 
