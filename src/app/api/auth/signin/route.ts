@@ -7,6 +7,9 @@ export async function POST(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { phoneNumber: body.phoneNumber },
+      include:{
+        details:{include:{trustedFriends:true}}
+      }
     });
 
     if (!user) {
@@ -15,6 +18,7 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
     }
+    
 
     return NextResponse.json(
       { success: true, message: "Sign-in successful", user },
