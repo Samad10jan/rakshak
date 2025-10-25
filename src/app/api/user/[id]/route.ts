@@ -43,7 +43,7 @@ export async function PUT(
     try {
         const param = await params;
         const { id } = param;
-        
+
         const body = await req.json();
         const { username, email, phoneNumber } = body;
 
@@ -67,11 +67,12 @@ export async function PUT(
 
 // ✅ DELETE user and all linked records
 export async function DELETE(
-    req: NextRequest,
-    { params }: { params: { id: string } }
+    req: NextRequest, { params }: { params: Promise<{ id: string }>}
 ) {
     try {
-        const { id } = params;
+        const param = await params;
+
+        const { id } = param;
 
         await prisma.user.delete({
             where: { id },
