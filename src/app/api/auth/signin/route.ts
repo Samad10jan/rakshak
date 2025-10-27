@@ -1,11 +1,12 @@
+import { corsHeaders } from "@/lib/cors";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*", // or replace * with "http://localhost:8081"
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
+// const corsHeaders = {
+//   "Access-Control-Allow-Origin": "*", // or replace * with "http://localhost:8081"
+//   "Access-Control-Allow-Methods": "POST, OPTIONS",
+//   "Access-Control-Allow-Headers": "Content-Type, Authorization",
+// };
 
 export async function OPTIONS() {
   // Handle preflight requests

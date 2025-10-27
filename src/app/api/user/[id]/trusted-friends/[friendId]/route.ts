@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { corsHeaders } from "@/lib/cors";
+
+// ✅ Preflight request handler
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
 
 // ✅ PUT update friend info
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ friendId: string }> }
@@ -20,11 +26,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ frie
             success: true,
             message: "Friend updated successfully",
             friend: updatedFriend,
-        });
+        }, { status: 200, headers: corsHeaders });
+
     } catch (error: any) {
         return NextResponse.json(
             { success: false, message: "Error updating friend", error: error.message },
-            { status: 500 }
+            { status: 500,headers: corsHeaders }
         );
     }
 }
@@ -45,11 +52,11 @@ export async function DELETE(
         return NextResponse.json({
             success: true,
             message: "Friend deleted successfully",
-        });
+        },{ status: 204, headers: corsHeaders });
     } catch (error: any) {
         return NextResponse.json(
             { success: false, message: "Error deleting friend", error: error.message },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }

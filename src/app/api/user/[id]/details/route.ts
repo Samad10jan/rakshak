@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-
-// ✅ Common CORS headers
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*", // Replace * with your frontend URL in production
-  "Access-Control-Allow-Methods": "GET, PUT, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
+import { corsHeaders } from "@/lib/cors";
 
 // ✅ Preflight request handler
 export async function OPTIONS() {

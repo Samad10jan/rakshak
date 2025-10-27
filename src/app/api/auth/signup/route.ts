@@ -1,13 +1,8 @@
 // app/api/auth/signup/route.ts
+import { corsHeaders } from "@/lib/cors";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-// ✅ Centralized CORS headers
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*", // or replace * with your frontend URL (e.g. "http://localhost:8081")
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
 
 // ✅ Handle preflight requests (browser sends this automatically)
 export async function OPTIONS() {

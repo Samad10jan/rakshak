@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { corsHeaders } from "@/lib/cors";
+
+// ✅ Preflight request handler
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
 
 // ✅ GET user by ID
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -20,15 +26,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         if (!user) {
             return NextResponse.json(
                 { success: false, message: "User not found" },
-                { status: 404 }
+                { status: 404, headers: corsHeaders }
             );
         }
 
-        return NextResponse.json({ success: true, user });
+        return NextResponse.json({ success: true, user },{ status: 204, headers: corsHeaders });
     } catch (error: any) {
         return NextResponse.json(
             { success: false, message: "Error fetching user", error: error.message },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }
@@ -53,11 +59,11 @@ export async function PUT(
             success: true,
             message: "User updated successfully",
             user: updatedUser,
-        });
+        },{ status: 201, headers: corsHeaders });
     } catch (error: any) {
         return NextResponse.json(
             { success: false, message: "Error updating user", error: error.message },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }
@@ -78,11 +84,11 @@ export async function DELETE(
         return NextResponse.json({
             success: true,
             message: "User deleted successfully",
-        });
+        },{ status: 204, headers: corsHeaders });
     } catch (error: any) {
         return NextResponse.json(
             { success: false, message: "Error deleting user", error: error.message },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }

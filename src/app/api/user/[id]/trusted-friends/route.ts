@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { corsHeaders } from "@/lib/cors";
+
+// ✅ Preflight request handler
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
+
 
 // ✅ GET all trusted friends of a user
 export async function GET(
@@ -20,7 +27,7 @@ export async function GET(
         if (!userDetails) {
             return NextResponse.json(
                 { success: false, message: "User details not found" },
-                { status: 404 }
+                { status: 404, headers: corsHeaders }
             );
         }
 
@@ -28,11 +35,12 @@ export async function GET(
             success: true,
             message: "User details fetched",
             friends: userDetails.trustedFriends,
-        });
+        }, { status: 200, headers: corsHeaders });
+
     } catch (error: any) {
         return NextResponse.json(
             { success: false, message: "Error fetching friends", error: error.message },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }
@@ -52,7 +60,7 @@ export async function POST(
         if (!name || !phone) {
             return NextResponse.json(
                 { success: false, message: "Name and phone are required" },
-                { status: 400 }
+                { status: 400, headers: corsHeaders }
             );
         }
 
@@ -63,7 +71,7 @@ export async function POST(
         if (!userDetails) {
             return NextResponse.json(
                 { success: false, message: "User details not found" },
-                { status: 404 }
+                { status: 404, headers: corsHeaders }
             );
         }
 
@@ -79,11 +87,11 @@ export async function POST(
             success: true,
             message: "Friend added successfully",
             friend,
-        });
+        }, { status: 201, headers: corsHeaders });
     } catch (error: any) {
         return NextResponse.json(
             { success: false, message: "Error adding friend", error: error.message },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }
