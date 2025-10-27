@@ -50,7 +50,7 @@ model TrustedFriend {
   userDetailsId String      @db.ObjectId
   userDetails   UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
   name          String
-  phone   String      @unique
+  phone         String      @unique
 }
 
 model SOSAlert {
@@ -60,8 +60,8 @@ model SOSAlert {
   timestamp     DateTime    @default(now())
   // optional { lat, lng }
   location      Json?
-  // "Active" | "Inactive" 
-  status        String      @default("inactive")
+  // "active" | "inactive" 
+  status        Status      @default(inactive)
   // one-to-many
   media         Media[]
 }
@@ -86,4 +86,8 @@ enum MediaType {
   audio
   video
   photo
+}
+enum Status {
+ active
+ inactive
 }
