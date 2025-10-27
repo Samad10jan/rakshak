@@ -2,27 +2,39 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
+// ✅ Centralized CORS headers
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*", // or replace * with your frontend URL (e.g. "http://localhost:8081")
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
 
+// ✅ Handle preflight requests (browser sends this automatically)
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
+
+// ✅ Main Signup Route
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { username, email, phoneNumber } = body;
 
-    // Server-Side Validation
+    // --- Validation ---
     if (!phoneNumber || phoneNumber.trim().length === 0) {
       return NextResponse.json(
-        { success: false, message: "Email is required" },
-        { status: 400 }
+        { success: false, message: "Phone number is required" },
+        { status: 400, headers: corsHeaders }
       );
     }
     if (!username || username.trim().length === 0) {
       return NextResponse.json(
         { success: false, message: "Username is required" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
-    // Check if user already exists
+    // --- Check if user exists ---
     const existingUser = await prisma.user.findUnique({
       where: { phoneNumber },
     });
@@ -30,11 +42,11 @@ export async function POST(req: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { success: false, message: "User already exists" },
-        { status: 409 }
+        { status: 409, headers: corsHeaders }
       );
     }
 
-    // Create new user
+    // --- Create user ---
     const newUser = await prisma.user.create({
       data: {
         username,
@@ -51,14 +63,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { success: true, message: "User registered successfully", user: newUser },
-      { status: 201 }
+      { status: 201, headers: corsHeaders }
     );
-    
   } catch (error: any) {
     console.error("Error in signup:", error);
     return NextResponse.json(
       { success: false, message: "Error creating user", error: error.message },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
