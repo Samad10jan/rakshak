@@ -13,7 +13,7 @@ export async function OPTIONS() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { username, email, phoneNumber } = body;
+    const { username, email, phoneNumber,password } = body;
 
     // --- Validation ---
     if (!phoneNumber || phoneNumber.trim().length === 0) {
@@ -25,6 +25,12 @@ export async function POST(req: NextRequest) {
     if (!username || username.trim().length === 0) {
       return NextResponse.json(
         { success: false, message: "Username is required" },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+     if (!password || password.trim().length === 0) {
+      return NextResponse.json(
+        { success: false, message: "Password is required" },
         { status: 400, headers: corsHeaders }
       );
     }
@@ -47,13 +53,14 @@ export async function POST(req: NextRequest) {
         username,
         email,
         phoneNumber,
+        password,
         details: {
           create: {
             message: "HELP!!", // default message
           },
         },
       },
-      include: { details: true },
+      
     });
 
     return NextResponse.json(

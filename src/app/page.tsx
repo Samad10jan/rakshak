@@ -158,23 +158,16 @@ const apiList = [
     path: "/api/auth/signup",
     method: "POST",
     desc: "Register a new user account. Creates user with default details (message: 'HELP!!'). Required fields: email, username, phoneNumber.",
-    body: { email: "abdul@example.com", username: "Abdul", phoneNumber: "9876543210" },
+    body: { email: "2001riya@gmail.com", username: "Riya", phoneNumber: "9876543210",password:"jkAbc!@12" },
     response: {
       success: true,
       message: "User registered successfully",
       user: {
         id: "68fcc70c132244eaf83b68b0",
         username: "ABD",
-        email: "abd@gmail.com",
+        email: "2001riya@gmail.com@gmail.com",
         phoneNumber: "9827453783",
         createdAt: "2025-10-25T12:48:12.732Z",
-        details: {
-          id: "68fcc70c132244eaf83b68b1",
-          userId: "68fcc70c132244eaf83b68b0",
-          permanentAddress: null,
-          codeWord: null,
-          message: "HELP !! "
-        }
       }
     },
     implemented: true
@@ -183,20 +176,19 @@ const apiList = [
     path: "/api/auth/signin",
     method: "POST",
     desc: "Sign in an existing user by phoneNumber. Returns user with all linked details.",
-    body: { phoneNumber: "986789XXXX" },
+    body: {
+      password: "jkAbc!@12",
+      phoneNumber: "9827453733"
+    },
     response: {
-      success: true, message: "Sign-in successful",
-      user: {
-        id: "68f857a510de027a2ec301e9",
-        username: "Abdul",
-        email: "abdulsamad@gmail.com",
-        phoneNumber: "9827453733",
-        createdAt: "2025-10-22T04:03:49.653Z",
-        details:
-        {
-          id: "68f857a510de027a2ec301ea", userId: "68f857a510de027a2ec301e9", permanentAddress: { lat: "...", lng: "..." }, "codeWord": "Not ok",
-          message: "HELP!"
-        }
+      "success": true,
+      "message": "Sign-in successful",
+      "user": {
+        "id": "68f857a510de027a2ec301e9",
+        "username": "Riya",
+        "email": "2001riya@gmail.com",
+        "phoneNumber": "9827453733",
+        "createdAt": "2025-10-22T04:03:49.653Z"
       }
     },
     implemented: true

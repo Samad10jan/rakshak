@@ -21,6 +21,7 @@ model User {
   username    String
   email       String?  @unique
   phoneNumber String   @unique
+  password    String   
   createdAt   DateTime @default(now())
 
   // 1-to-1 Relation with UserDetails
@@ -87,7 +88,8 @@ enum MediaType {
   video
   photo
 }
+
 enum Status {
- active
- inactive
+  active
+  inactive
 }
