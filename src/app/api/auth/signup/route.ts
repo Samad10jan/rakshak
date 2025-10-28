@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
           },
         },
       },
-      
+      omit:{password}
     });
 
     return NextResponse.json(

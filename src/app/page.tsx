@@ -158,7 +158,7 @@ const apiList = [
     path: "/api/auth/signup",
     method: "POST",
     desc: "Register a new user account. Creates user with default details (message: 'HELP!!'). Required fields: email, username, phoneNumber.",
-    body: { email: "2001riya@gmail.com", username: "Riya", phoneNumber: "9876543210",password:"jkAbc!@12" },
+    body: { email: "2001riya@gmail.com", username: "Riya", phoneNumber: "9827453783",password:"jkAbc!@12" },
     response: {
       success: true,
       message: "User registered successfully",
