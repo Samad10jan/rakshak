@@ -6,12 +6,12 @@ export async function OPTIONS() {
   // Handle preflight requests
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
-export async function GET(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ userid: string }> }) {
   try {
-    const { userId } = await params;
+    const { userid } = await params;
 
     const userDetails = await prisma.userDetails.findUnique({
-      where: { userId },
+      where: { userId:userid },
       include: {
         sosHistory: {
           include: { media: true },
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
       },
     });
 
-    
+
     if (!userDetails) {
       return NextResponse.json(
         { success: false, message: "User not found or no details" },
