@@ -164,7 +164,7 @@ const apiList = [
       message: "User registered successfully",
       user: {
         id: "68fcc70c132244eaf83b68b0",
-        username: "ABD",
+        username: "Riya",
         email: "2001riya@gmail.com@gmail.com",
         phoneNumber: "9827453783",
         createdAt: "2025-10-25T12:48:12.732Z",
