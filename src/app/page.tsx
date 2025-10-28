@@ -187,14 +187,14 @@ const apiList = [
     response: {
       success: true, message: "Sign-in successful",
       user: {
-        id: "68f857a510de027a2ec301e9", 
+        id: "68f857a510de027a2ec301e9",
         username: "Abdul",
-        email: "abdulsamad@gmail.com", 
+        email: "abdulsamad@gmail.com",
         phoneNumber: "9827453733",
-         createdAt: "2025-10-22T04:03:49.653Z", 
-         details:
+        createdAt: "2025-10-22T04:03:49.653Z",
+        details:
         {
-          id: "68f857a510de027a2ec301ea", userId: "68f857a510de027a2ec301e9", permanentAddress: {lat:"...",lng:"..."}, "codeWord": "Not ok",
+          id: "68f857a510de027a2ec301ea", userId: "68f857a510de027a2ec301e9", permanentAddress: { lat: "...", lng: "..." }, "codeWord": "Not ok",
           message: "HELP!"
         }
       }
@@ -253,7 +253,7 @@ const apiList = [
     response: {
       success: true,
       message: "Friend added successfully",
-      friend: { id: "8s7d09as8d0a9",userDetailsId:"68f857a510de027a2ec301ea", name: "Ali", phone: "9876543211" }
+      friend: { id: "8s7d09as8d0a9", userDetailsId: "68f857a510de027a2ec301ea", name: "Ali", phone: "9876543211" }
     },
     implemented: true
   },
@@ -284,34 +284,79 @@ const apiList = [
 
   // 🚨 SOS ALERTS
   {
-    path: "/api/sos-alert/create",
+    path: "/api/sos-alert",
     method: "POST",
     desc: "Create a new SOS alert with location coordinates linked to userDetailsId.",
-    body: { userDetailsId: "66eabc...", location: { lat: 12.92, lng: 77.62 } },
-    response: {
-      success: true,
-      message: "SOS alert created successfully",
-      alert: { id: "sos123", status: "active", createdAt: "2025-10-25T12:00Z" }
+    body: {
+      "userDetailsId": "652fbfe1b7a83db45b3ef342",
+      "location": { "lat": 12.9716, "lng": 77.5946 },
+      "status": "active"
     },
-    implemented: false
+    response: {
+      "success": true,
+      "message": "SOS alert created successfully",
+      "sos": {
+        "id": "6530a1f3b5c7da1a5a2b2cd9",
+        "userDetailsId": "652fbfe1b7a83db45b3ef342",
+        "timestamp": "2025-10-25T11:32:56.492Z",
+        "location": { "lat": 12.9716, "lng": 77.5946 },
+        "status": "active"
+      }
+    }
+    ,
+    implemented: true
   },
   {
     path: "/api/sos-alert/[id]",
     method: "GET, PUT, DELETE",
     desc: "Get, update, or delete a specific SOS alert.",
-    body: { status: "inactive" },
-    response: { success: true, message: "SOS alert updated successfully" },
-    implemented: false
+    body: {
+      "location": { "lat": 12.9720, "lng": 77.5952 },
+      "status": "active"
+    }
+    ,
+    response: {
+      "success": true,
+      "message": "SOS updated successfully",
+      "sos": {
+        "id": "6530a1f3b5c7da1a5a2b2cd9",
+        "timestamp": "2025-10-25T11:32:56.492Z",
+        "location": { "lat": 12.9720, "lng": 77.5952 },
+        "status": "active"
+      }
+    }
+
+    ,
+    implemented: true
   },
   {
     path: "/api/sos-alert/user/[userId]",
     method: "GET",
     desc: "Fetch all SOS alerts belonging to a specific user.",
     response: [
-      { id: "sos1", status: "active", createdAt: "2025-10-20T12:00Z" },
-      { id: "sos2", status: "inactive", createdAt: "2025-10-22T14:00Z" }
+      {
+        "success": true,
+        "total": 2,
+        "sosHistory": [
+          {
+            "id": "6530a1f3b5c7da1a5a2b2cd9",
+            "timestamp": "2025-10-25T11:32:56.492Z",
+            "status": "inactive",
+            "location": { "lat": 12.9716, "lng": 77.5946 },
+            "media": []
+          },
+          {
+            "id": "6530a1f3b5c7da1a5a2b2ce0",
+            "timestamp": "2025-10-25T12:00:23.492Z",
+            "status": "active",
+            "location": { "lat": 12.9719, "lng": 77.5950 },
+            "media": []
+          }
+        ]
+      }
+
     ],
-    implemented: false
+    implemented: true
   },
 
   // 🗂️ MEDIA MANAGEMENT
