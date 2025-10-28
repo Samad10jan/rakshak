@@ -20,6 +20,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
       },
     });
 
+    
     if (!userDetails) {
       return NextResponse.json(
         { success: false, message: "User not found or no details" },
