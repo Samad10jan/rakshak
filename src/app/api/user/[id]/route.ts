@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { corsHeaders } from "@/lib/cors";
 
-// ✅ Preflight request handler
+//  Preflight request handler
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
-// ✅ GET user by ID
+//  GET user by ID
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const param = await params;
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 }
 
-// ✅ PUT update user info
+//  PUT update user info
 export async function PUT(
     req: NextRequest, { params }: { params: Promise<{ id: string }> }
 ) {
@@ -68,7 +68,7 @@ export async function PUT(
     }
 }
 
-// ✅ DELETE user and all linked records
+//  DELETE user and all linked records
 export async function DELETE(
     req: NextRequest, { params }: { params: Promise<{ id: string }>}
 ) {

@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { corsHeaders } from "@/lib/cors";
 
-// ✅ Preflight request handler
+//  Preflight request handler
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
 
-// ✅ GET all trusted friends of a user
+//  GET all trusted friends of a user
 export async function GET(
     req: NextRequest, { params }: { params: Promise<{ id: string }> }
 ) {
@@ -45,7 +45,7 @@ export async function GET(
     }
 }
 
-// ✅ POST add a new trusted friend
+//  POST add a new trusted friend
 export async function POST(
     req: NextRequest, { params }: { params: Promise<{ id: string }> }
 ) {

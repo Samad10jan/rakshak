@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { corsHeaders } from "@/lib/cors";
 
-// ✅ Preflight request handler
+//  Preflight request handler
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
-// ✅ GET user details
+//  GET user details
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -48,7 +48,7 @@ export async function GET(
   }
 }
 
-// ✅ PUT update user details
+//  PUT update user details
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

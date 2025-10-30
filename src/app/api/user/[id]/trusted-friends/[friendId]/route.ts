@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { corsHeaders } from "@/lib/cors";
 
-// ✅ Preflight request handler
+// Preflight request handler
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
-
-// ✅ PUT update friend info
+// /api/user/[id]/trusted-friends/[friendId]
+//  PUT update friend info
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ friendId: string }> }
 ) {
     try {
@@ -36,7 +36,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ frie
     }
 }
 
-// ✅ DELETE remove friend
+//  DELETE remove friend
 export async function DELETE(
    req: NextRequest, { params }: { params: Promise<{ friendId: string }>}
 ) {
