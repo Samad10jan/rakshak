@@ -280,7 +280,7 @@ const apiList = [
     method: "POST",
     desc: "Create a new SOS alert with location coordinates linked to userDetailsId.",
     body: {
-      "userDetailsId": "652fbfe1b7a83db45b3ef342",
+      "userId": "68ffa766ac0cd72ed42de692",
       "location": { "lat": 12.9716, "lng": 77.5946 },
       "status": "active"
     },
