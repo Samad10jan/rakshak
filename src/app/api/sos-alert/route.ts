@@ -3,11 +3,12 @@ import prisma from "@/lib/prisma";
 import { corsHeaders } from "@/lib/cors";
 
 export async function OPTIONS() {
-  // Handle preflight requests
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
-// CREATE SOS Alert
+// =============================
+// CREATE SOS ALERT (POST)
+// =============================
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ✅ Find the user's details record
+    // Find userDetails row using userId
     const userDetails = await prisma.userDetails.findUnique({
       where: { userId },
       select: { id: true },
@@ -33,10 +34,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ✅ Create the SOS alert linked to userDetails
+    // Create SOS Alert
     const sos = await prisma.sOSAlert.create({
       data: {
-        userDetailsId: userDetails.id, // ✅ must pass ID value, not object
+        userDetailsId: userDetails.id,
         location: location || {},
         status: status || "active",
       },
@@ -63,9 +64,9 @@ export async function POST(req: NextRequest) {
   }
 }
 
-
-//  Admin
-//  GET All SOS Alerts
+// =============================
+// ADMIN — GET ALL SOS ALERTS
+// =============================
 export async function GET() {
   try {
     const allSOS = await prisma.sOSAlert.findMany({
@@ -73,15 +74,22 @@ export async function GET() {
       orderBy: { timestamp: "desc" },
     });
 
-    return NextResponse.json({
-      success: true,
-      total: allSOS.length,
-      allSOS,
-    }, { status: 200, headers: corsHeaders });
+    return NextResponse.json(
+      {
+        success: true,
+        total: allSOS.length,
+        allSOS,
+      },
+      { status: 200, headers: corsHeaders }
+    );
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, message: "Error fetching SOS alerts", error: error.message },
-       { status: 500, headers: corsHeaders }
+      {
+        success: false,
+        message: "Error fetching SOS alerts",
+        error: error.message,
+      },
+      { status: 500, headers: corsHeaders }
     );
   }
 }
