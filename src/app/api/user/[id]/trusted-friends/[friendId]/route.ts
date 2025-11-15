@@ -4,7 +4,7 @@ import { corsHeaders } from "@/lib/cors";
 
 // Preflight request handler
 export async function OPTIONS() {
-  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+    return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 // /api/user/[id]/trusted-friends/[friendId]
 //  PUT update friend info
@@ -31,37 +31,35 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ frie
     } catch (error: any) {
         return NextResponse.json(
             { success: false, message: "Error updating friend", error: error.message },
-            { status: 500,headers: corsHeaders }
+            { status: 500, headers: corsHeaders }
         );
     }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { friendId: string } }) {
-  try {
-    const { friendId } = params;
+//  DELETE remove friend
+export async function DELETE(
+    req: NextRequest, { params }: { params: Promise<{ friendId: string }> }
+) {
+    try {
+        const param = await params;
 
-    // Check if the friend exists
-    const friend = await prisma.trustedFriend.findUnique({ where: { id: friendId } });
-    if (!friend) {
-      return NextResponse.json({
-        success: false,
-        message: "Friend not found",
-      }, { status: 404, headers: corsHeaders });
+        const { friendId } = param;
+
+        if (!friendId) {
+            return NextResponse.json({ success: false, message: "Friend not found" }, { status: 404, headers: corsHeaders });
+        }
+        await prisma.trustedFriend.delete({
+            where: { id: friendId },
+        });
+
+        return NextResponse.json({
+            success: true,
+            message: "Friend deleted successfully",
+        }, { status: 200, headers: corsHeaders });
+    } catch (error: any) {
+        return NextResponse.json(
+            { success: false, message: "Error deleting friend", error: error.message },
+            { status: 500, headers: corsHeaders }
+        );
     }
-
-    // Delete the friend
-    await prisma.trustedFriend.delete({ where: { id: friendId } });
-
-    return NextResponse.json({
-      success: true,
-      message: "Friend deleted successfully",
-    }, { status: 200, headers: corsHeaders });
-
-  } catch (error: any) {
-    console.error("Delete friend error:", error);
-    return NextResponse.json(
-      { success: false, message: "Error deleting friend", error: error.message },
-      { status: 500, headers: corsHeaders }
-    );
-  }
 }
