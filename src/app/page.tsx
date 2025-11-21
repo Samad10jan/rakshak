@@ -421,25 +421,6 @@ Fetch all media linked to a specific SOSAlert by its ID.
     implemented: true
   },
 
-  {
-    path: "/api/media/[id]",
-    method: "DELETE",
-    desc: `
-Delete a specific media by its database ID.
-- Removes the media from Cloudinary and MongoDB
-- Only the media record with the given ID is deleted
-`,
-    params: {
-      id: "string (Media ID)"
-    },
-    response: {
-      success: true,
-      message: "Media deleted successfully"
-    },
-    implemented: false
-  }
-  ,
-
   // 💓 HEALTH CHECK
   {
     path: "/api/health",
