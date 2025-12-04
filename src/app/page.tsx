@@ -353,43 +353,62 @@ const apiList = [
 
   // 🗂️ MEDIA MANAGEMENT
 
-  {
-    path: "/api/media/upload",
-    method: "POST",
-    desc: `
+  // 🗂️ MEDIA MANAGEMENT
+{
+  path: "/api/media/upload",
+  method: "POST",
+  desc: `
 Upload multiple media files (photos and/or a single audio) linked to an SOS alert.
 - Images are uploaded to Cloudinary folder: Rakshak_uploads/images
 - Audio is uploaded to Cloudinary folder: Rakshak_uploads/audio
-- Max image size: 10 MB
+- Max image size: 13 MB
 - Max audio size: 15 MB
-- Metadata (title & description) is optional and stored in Cloudinary context
+- Metadata (sosAlertId & timestamp) is stored in Cloudinary context
 - Media metadata is saved in MongoDB (Media collection) linked to SOSAlert
+- Metadata (title & description) is optional and also stored in Cloudinary context
 `,
-    body: {
-      sosAlertId: "string",          // ID of the SOSAlert to attach media
-      files: "File[]",               // Multiple image files
-      audio: "File (optional)",      // Single audio file
-      title: "string (optional)",    // Metadata title
-      description: "string (optional)" // Metadata description
-    },
-    response: {
-      uploaded: [
-        {
-          id: "string",            // Media ID in database
-          sosAlertId: "string",    // Linked SOSAlert ID
-          type: "photo | audio",   // Media type
-          publicId: "string",      // Cloudinary public_id
-          url: "string",           // Secure Cloudinary URL
-          format: "string",        // File format
-          width: "number (optional, for images)",
-          height: "number (optional, for images)",
-          duration: "number (optional, for audio)",
-          uploadedAt: "DateTime"
-        }
-      ]
-    },
-    implemented: true
+  body: {
+    sosAlertId: "string",          // ID of the SOSAlert to attach media
+    files: "File[]",               // Multiple image files
+    audio: "File (optional)",      // Single audio file
+    title: "string (optional)",    // Metadata title
+    description: "string (optional)" // Metadata description
   },
+  response: {
+    uploaded: [
+      {
+        id: "string",            // Media ID in database
+        sosAlertId: "string",    // Linked SOSAlert ID
+        type: "photo | audio",   // Media type
+        publicId: "string",      // Cloudinary public_id
+        url: "string",           // Secure Cloudinary URL
+        format: "string",        // File format
+        width: "number (optional, for images)",
+        height: "number (optional, for images)",
+        duration: "number (optional, for audio)",
+        uploadedAt: "DateTime",
+        metadata: {              // Cloudinary context metadata
+          sosAlertId: "string",
+          timestamp: "string",
+          title: "string",
+          description: "string"
+        }
+      }
+    ]
+  },
+  implemented: true
+},
+{
+  path: "/api/media/[id]",
+  method: "GET, DELETE",
+  desc: "Fetch or delete specific media using its ID. DELETE removes both MongoDB record and Cloudinary file.",
+  response: { 
+    success: true, 
+    message: "Media deleted successfully or fetched media object" 
+  },
+  implemented: true
+}
+,
 
   {
     path: "/api/media/[id]",

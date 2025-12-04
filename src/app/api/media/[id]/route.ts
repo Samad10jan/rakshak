@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { corsHeaders } from '@/lib/cors';
+
+export async function OPTIONS() {
+    // Handle preflight requests (CORS)
+    return NextResponse.json({}, { status: 200, headers: corsHeaders });
+}
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string; }> }) {
     try {
@@ -9,7 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         if (!sosAlertId) {
             return NextResponse.json(
                 { error: 'SOSAlert ID required' },
-                { status: 400 }
+                { status: 400, headers: corsHeaders }
             );
         }
 
@@ -34,6 +40,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         return NextResponse.json({ media });
     } catch (error: any) {
         const message = error.message || 'Failed to fetch media';
-        return NextResponse.json({ error: message }, { status: 500 });
+        return NextResponse.json({ error: message }, { status: 500, headers: corsHeaders });
     }
 }
