@@ -21,10 +21,23 @@ export async function POST(req: NextRequest) {
     }
 
    
-    const user = await prisma.user.findUnique({
+    // const user = await prisma.user.findUnique({
+    //   where: { phoneNumber },omit:{password},
+      
+    // });
+ 
+     const user = await prisma.user.findUnique({
       where: { phoneNumber },omit:{password},
+      include:{
+        details:{
+          select:{
+            codeWord:true
+          }
+        }
+      }
       
     });
+  
 
     if (!user) {
       return NextResponse.json(
