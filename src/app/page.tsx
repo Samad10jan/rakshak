@@ -490,7 +490,7 @@ function TestApiPanel({ selected }: { selected: ApiEndpoint | null }) {
   };
 
   return (
-    <Card className="border-2">
+    <Card className="border-2 ">
       <CardContent className="p-6 space-y-4">
         <h2 className="text-xl font-bold flex items-center gap-2">
           <span className="text-2xl">🧪</span>Test Endpoint
@@ -569,7 +569,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen  bg-gradient-to-r from-purple-400 via-emerald-400 to-indigo-400 flex items-center justify-center py-8 px-3 sm:px-6">
+    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 to-indigo-100 justify-center py-8 px-3 sm:px-6">
       <main className="w-full max-w-2xl md:max-w-4xl bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg border border-white/30 p-5 sm:p-8 ">
         {/* Header */}
         <div className="text-center mb-8 flex flex-col items-center">
