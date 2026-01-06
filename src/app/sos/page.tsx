@@ -80,7 +80,7 @@ export default function SosHistoryPage() {
     const fetchSosHistory = async (userId: string) => {
         try {
             setLoading(true);
-            const res = await fetch(`/api/sos-alert/user/${userId}`);
+            const res = await fetch(`/api/sos-alert/user/${userId}`,{next:{revalidate:130}});
             const data = await res.json();
             if (!res.ok) {
                 setError(data.message || "Failed to fetch SOS history");

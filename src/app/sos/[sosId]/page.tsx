@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import next from "next";
 
 type Sos = {
   id: string;
@@ -37,7 +38,7 @@ export default function SosAlertPage({
     async function getSos() {
       try {
         const { sosId } = await params;
-        const res = await fetch(`/api/sos-alert/${sosId}`);
+        const res = await fetch(`/api/sos-alert/${sosId}`,{next:{revalidate:130}});
         const data = await res.json();
 
         if (!res.ok) {
