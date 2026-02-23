@@ -1,6 +1,8 @@
 'use client';
 
+import { Book, History } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function RakshakHomepage() {
@@ -18,17 +20,45 @@ export default function RakshakHomepage() {
     <div className="min-h-screen bg-gradient-to-br from-[#2b0f3a] via-[#1f082a] to-black text-white">
 
       {/* Navbar */}
-      <nav className="flex items-center px-6 py-4 border-b border-pink-500/30">
-        <div className="relative w-10 h-10 mr-2">
-          <Image
-            src="/rakshak.png"
-            alt="logo"
-            fill
-            className="object-cover"
-            loading="lazy"
-          />
+      <nav className="w-full border-b backdrop-blur sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+
+      
+          <Link href="/" className="flex items-center gap-2">
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10">
+              <Image
+                src="/rakshak.png"
+                alt="Rakshak Logo"
+                fill
+                className="object-cover rounded"
+                loading="lazy"
+              />
+            </div>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-pink-500">
+              Rakshak
+            </h1>
+          </Link>
+
+          <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm md:text-base">
+
+            <Link
+              href="/sos"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 hover:text-pink-500 transition"
+            >
+              <History size={18} />
+              <span>SOS History</span>
+            </Link>
+
+            <Link
+              href="/documentation"
+              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 hover:text-pink-500 transition"
+            >
+              <Book size={18} />
+              <span>Documentation</span>
+            </Link>
+
+          </div>
         </div>
-        <h1 className="text-2xl font-bold text-pink-500">Rakshak</h1>
       </nav>
 
       {/* Hero Section */}
@@ -56,10 +86,9 @@ export default function RakshakHomepage() {
               key={index}
               onClick={() => setActiveFeature(index)}
               className={`p-6 rounded-xl cursor-pointer transition-all border
-                ${
-                  activeFeature === index
-                    ? 'border-pink-500 bg-pink-500/10 shadow-lg shadow-pink-500/20'
-                    : 'border-purple-800 bg-purple-950/70 hover:border-pink-500/50'
+                ${activeFeature === index
+                  ? 'border-pink-500 bg-pink-500/10 shadow-lg shadow-pink-500/20'
+                  : 'border-purple-800 bg-purple-950/70 hover:border-pink-500/50'
                 }`}
             >
               <div className="text-4xl mb-4">{feature.icon}</div>
