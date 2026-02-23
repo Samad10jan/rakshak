@@ -21,7 +21,7 @@ model User {
   username    String
   email       String?  @unique
   phoneNumber String   @unique
-  password    String   
+  password    String
   createdAt   DateTime @default(now())
 
   // 1-to-1 Relation with UserDetails
@@ -34,10 +34,10 @@ model UserDetails {
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   // optional { lat, lng }
   permanentAddress Json?
-  // optional secret trigger word
-  codeWord         String?
+  // secret trigger word
+  codeWord         String         @default("help")
   // default SOS message
-  message          String          @default("HELP!!")
+  message          String          @default("HELP!!! I am in danger.")
   // one-to-many
   trustedFriends   TrustedFriend[]
   // one-to-many
