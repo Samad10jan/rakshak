@@ -1,4 +1,5 @@
 import { corsHeaders } from "@/lib/cors";
+import { signToken } from "@/lib/jwt";
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -49,12 +50,27 @@ export async function POST(req: NextRequest) {
     // Remove password before sending response
     const { password: _, ...safeUser } = user;
 
-    return NextResponse.json(
+
+    const res = NextResponse.json(
       { success: true, message: "Sign-in successful", user: safeUser },
       { status: 200, headers: corsHeaders }
     );
 
+    const token = signToken(user.id);
+
+    res.cookies.set("token", token, {
+      httpOnly: true,
+    
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return res;
+
   } catch (error: any) {
+    console.log(error.message);
+    
     return NextResponse.json(
       { success: false, message: "Error during sign-in" },
       { status: 500, headers: corsHeaders }

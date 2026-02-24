@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Sos = {
   id: string;
@@ -36,23 +36,33 @@ export default function SosAlertPage() {
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState(false);
 
+  const isMounted = useRef(true);
+
+  /* ---------------- FETCH + POLLING ---------------- */
+
   useEffect(() => {
     if (!sosId) return;
 
-    let intervalId: NodeJS.Timeout;
+    isMounted.current = true;
+    setLoading(true);
 
     const getSos = async () => {
       try {
         const res = await fetch(`/api/sos-alert/${sosId}`, {
-          cache: "no-store", // VERY IMPORTANT (prevents caching)
+          cache: "no-store",
         });
 
         const data = await res.json();
 
         if (!res.ok) {
-          setError(data.message || "Failed to fetch SOS");
+          if (isMounted.current) {
+            setError(data.message || "Failed to fetch SOS");
+            setSos(null);
+          }
           return;
         }
+
+        if (!isMounted.current) return;
 
         if (data.sos.status === "active") {
           setSos(data.sos);
@@ -62,23 +72,28 @@ export default function SosAlertPage() {
           setError("This SOS alert is no longer active");
         }
       } catch (err: any) {
-        setError(err.message || "Something went wrong");
+        if (isMounted.current) {
+          setError(err.message || "Something went wrong");
+          setSos(null);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted.current) {
+          setLoading(false);
+        }
       }
     };
 
-    // Initial fetch
     getSos();
 
-    // Poll every 30 seconds
-    intervalId = setInterval(() => {
-      getSos();
-    }, 30000);
+    const intervalId = setInterval(getSos, 30000);
 
-    // Cleanup
-    return () => clearInterval(intervalId);
+    return () => {
+      isMounted.current = false;
+      clearInterval(intervalId);
+    };
   }, [sosId]);
+
+  /* ---------------- ESC CLOSE ---------------- */
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -90,32 +105,37 @@ export default function SosAlertPage() {
     return () => window.removeEventListener("keydown", handleEscape);
   }, []);
 
+  /* ---------------- STATUS COLOR ---------------- */
+
   const getStatusColor = (status: string) =>
     status === "active"
       ? "bg-red-500 animate-pulse"
       : "bg-gray-500";
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
+  /* ---------------- COPY ---------------- */
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    } catch {
+      console.error("Failed to copy");
+    }
   };
 
-  if (loading)
-    return (
-      <Loading />
-    );
+  /* ---------------- STATES ---------------- */
 
-  if (error)
-    return (
-      <Error error={error} />
-    );
+  if (loading) return <Loading />;
+
+  if (error) return <Error error={error} />;
 
   if (!sos) return null;
 
+  /* ---------------- UI (UNCHANGED) ---------------- */
+
   return (
     <>
-      {/* Fullscreen Image */}
       {fullScreenImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center"
@@ -155,7 +175,6 @@ export default function SosAlertPage() {
                 </Badge>
               </div>
 
-              {/* ID */}
               <div>
                 <p className="text-sm text-gray-500">Alert ID</p>
                 <p className="font-mono break-all">{sos.id}</p>

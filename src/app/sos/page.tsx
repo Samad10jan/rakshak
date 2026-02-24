@@ -6,8 +6,10 @@ import Loading from "@/components/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Pin } from "lucide-react";
+import { getUserIdFromCookie } from "@/lib/context";
+import { Clock, Pin, XIcon } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 type Sos = {
@@ -36,28 +38,38 @@ export default function SosHistoryPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
-    const [loginLoading, setLoginLoading] = useState(false);
-    const [loginError, setLoginError] = useState<string | null>(null);
-    const [formData, setFormData] = useState({ phoneNumber: "", password: "" });
     const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
-
-    /* ---------------- COOKIE ---------------- */
-
-    const getCookie = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(";").shift() ?? "";
-    };
+    const router = useRouter();
 
     /* ---------------- INITIAL LOAD ---------------- */
 
     useEffect(() => {
-        const userId = getCookie("userId");
-        if (userId) {
-            fetchSosHistory(userId);
-        } else {
-            setLoading(false);
+        if (!loading && !user) {
+            router.replace("/login");
         }
+    }, [loading, user, router]);
+
+    useEffect(() => {
+
+        async function getData() {
+            try {
+                const userId = await getUserIdFromCookie()
+                if (userId) {
+                    fetchSosHistory(userId);
+                } else {
+                    setUser(null)
+                    setLoading(false);
+                }
+
+            } catch (err: any) {
+                console.log(err.message);
+
+                setLoading(false)
+
+            }
+
+        }
+        getData()
     }, []);
 
     /* ---------------- ESC CLOSE FULLSCREEN ---------------- */
@@ -119,40 +131,6 @@ export default function SosHistoryPage() {
         [sosHistory]
     );
 
-    /* ---------------- LOGIN ---------------- */
-
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoginLoading(true);
-        setLoginError(null);
-
-        try {
-            const res = await fetch("/api/auth/signin", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                setLoginError(data.message || "Login failed");
-                return;
-            }
-
-            const userId = data.user.id;
-
-            document.cookie = `userId=${userId}; path=/; max-age=${60 * 60 * 24 * 7
-                }; SameSite=Lax`;
-
-            setUser(data.user);
-            fetchSosHistory(userId);
-        } catch (err: any) {
-            setLoginError(err.message || "Something went wrong");
-        } finally {
-            setLoginLoading(false);
-        }
-    };
 
     /* ---------------- STATUS COLOR ---------------- */
 
@@ -169,60 +147,9 @@ export default function SosHistoryPage() {
 
     /* ---------------- STATES ---------------- */
 
-    if (loading)
-        return (
-           <Loading/>
-        );
-
-    if (!user)
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-                <Card className="w-full max-w-md shadow-xl">
-                    <CardContent className="p-8">
-                        <h2 className="text-2xl font-bold text-center mb-6">
-                            Login to View SOS History
-                        </h2>
-
-                        <form onSubmit={handleLogin} className="space-y-4">
-                            <input
-                                type="tel"
-                                placeholder="Phone Number"
-                                className="w-full border rounded-lg px-4 py-3"
-                                value={formData.phoneNumber}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, phoneNumber: e.target.value })
-                                }
-                                required
-                            />
-
-                            <input
-                                type="password"
-                                placeholder="Password"
-                                className="w-full border rounded-lg px-4 py-3"
-                                value={formData.password}
-                                onChange={(e) =>
-                                    setFormData({ ...formData, password: e.target.value })
-                                }
-                                required
-                            />
-
-                            {loginError && (
-                                <div className="text-red-600 text-sm">{loginError}</div>
-                            )}
-
-                            <Button className="w-full">
-                                {loginLoading ? "Logging in..." : "Login"}
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            </div>
-        );
-
-    if (error)
-        return (
-            <Error error={error}/>
-        );
+    if (loading) return <Loading />;
+    if (error) return <Error error={error} />;
+    if (!user) return null;
 
     if (sosHistory.length === 0)
         return (
@@ -238,11 +165,11 @@ export default function SosHistoryPage() {
             {/* Fullscreen Modal */}
             {fullScreenImage && (
                 <div
-                    className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-3 sm:p-6"
+                    className="fixed inset-0 z-55 bg-black/95 flex items-center justify-center p-3 sm:p-6"
                     onClick={() => setFullScreenImage(null)}
                 >
                     <div
-                        className="relative w-full max-w-7xl h-[75vh] sm:h-[85vh]"
+                        className="relative w-full max-w-xl h-[75vh] sm:h-[85vh] bg-neutral-800"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <Image
@@ -254,6 +181,8 @@ export default function SosHistoryPage() {
                             priority
                         />
                     </div>
+                    <Button onClick={() => setFullScreenImage(null)} className="rounded-full hover:bg-red-500 text-white absolute top-0 right-0 m-5 text-center ring-2 active:bg-red-500 ring-red-500 transtion-all duration-300"><XIcon /></Button>
+
                 </div>
             )}
 
@@ -262,13 +191,13 @@ export default function SosHistoryPage() {
 
                     {/* Heading */}
                     <div className=" flex justify-center items-center gap-4 text-xl md:text-4xl mb-8 mt-2">
-                        
-                            <Clock color="red" size={40}/> Your SOS History
-                        
+
+                        <Clock color="red" size={40} /> Your SOS History
+
                     </div>
 
                     {/* Date Filter */}
-                    <div className="sticky top-10 *:bg-white z-99 w-fit mx-auto">
+                    <div className="sticky top-10 *:bg-white z-51 w-fit mx-auto">
                         <DateFilter onFilter={handleDateFilter} />
                     </div>
 
@@ -304,7 +233,7 @@ export default function SosHistoryPage() {
                                             {/* Location */}
                                             {sos.location && (
                                                 <div className="text-sm sm:text-base mb-4 break-all flex items-center gap-2">
-                                                    <Pin size={15} color="red"/> {sos.location.lat}, {sos.location.lng}
+                                                    <Pin size={15} color="red" /> {sos.location.lat}, {sos.location.lng}
                                                 </div>
                                             )}
 
