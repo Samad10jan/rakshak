@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from "@/components/ui/accordion";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 const API_BASE = "https://rakshak-gamma.vercel.app/api/";
 const ACCESS_CODE = "P20Rakshak";
@@ -215,10 +215,10 @@ const apiList = [
 
   // 🗂️ MEDIA MANAGEMENT
 
-{
-  path: "/api/media/upload",
-  method: "POST",
-  desc: `
+  {
+    path: "/api/media/upload",
+    method: "POST",
+    desc: `
 Upload multiple media files (photos and/or a single audio) linked to an SOS alert.
 - Images are uploaded to Cloudinary folder: Rakshak_uploads/images
 - Audio is uploaded to Cloudinary folder: Rakshak_uploads/audio
@@ -228,48 +228,48 @@ Upload multiple media files (photos and/or a single audio) linked to an SOS aler
 - Media metadata is saved in MongoDB (Media collection) linked to SOSAlert
 - Metadata (title & description) is optional and also stored in Cloudinary context
 `,
-  body: {
-    sosAlertId: "string",          // ID of the SOSAlert to attach media
-    files: "File[]",               // Multiple image files
-    audio: "File (optional)",      // Single audio file
-    title: "string (optional)",    // Metadata title
-    description: "string (optional)" // Metadata description
-  },
-  response: {
-    uploaded: [
-      {
-        id: "string",            // Media ID in database
-        sosAlertId: "string",    // Linked SOSAlert ID
-        type: "photo | audio",   // Media type
-        publicId: "string",      // Cloudinary public_id
-        url: "string",           // Secure Cloudinary URL
-        format: "string",        // File format
-        width: "number (optional, for images)",
-        height: "number (optional, for images)",
-        duration: "number (optional, for audio)",
-        uploadedAt: "DateTime",
-        metadata: {              // Cloudinary context metadata
-          sosAlertId: "string",
-          timestamp: "string",
-          title: "string",
-          description: "string"
+    body: {
+      sosAlertId: "string",          // ID of the SOSAlert to attach media
+      files: "File[]",               // Multiple image files
+      audio: "File (optional)",      // Single audio file
+      title: "string (optional)",    // Metadata title
+      description: "string (optional)" // Metadata description
+    },
+    response: {
+      uploaded: [
+        {
+          id: "string",            // Media ID in database
+          sosAlertId: "string",    // Linked SOSAlert ID
+          type: "photo | audio",   // Media type
+          publicId: "string",      // Cloudinary public_id
+          url: "string",           // Secure Cloudinary URL
+          format: "string",        // File format
+          width: "number (optional, for images)",
+          height: "number (optional, for images)",
+          duration: "number (optional, for audio)",
+          uploadedAt: "DateTime",
+          metadata: {              // Cloudinary context metadata
+            sosAlertId: "string",
+            timestamp: "string",
+            title: "string",
+            description: "string"
+          }
         }
-      }
-    ]
+      ]
+    },
+    implemented: true
   },
-  implemented: true
-},
-{
-  path: "/api/media/[id]",
-  method: "GET, DELETE",
-  desc: "Fetch or delete specific media using its ID. DELETE removes both MongoDB record and Cloudinary file.",
-  response: { 
-    success: true, 
-    message: "Media deleted successfully or fetched media object" 
-  },
-  implemented: true
-}
-,
+  {
+    path: "/api/media/[id]",
+    method: "GET, DELETE",
+    desc: "Fetch or delete specific media using its ID. DELETE removes both MongoDB record and Cloudinary file.",
+    response: {
+      success: true,
+      message: "Media deleted successfully or fetched media object"
+    },
+    implemented: true
+  }
+  ,
 
   {
     path: "/api/media/[id]",

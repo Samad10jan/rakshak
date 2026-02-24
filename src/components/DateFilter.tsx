@@ -25,7 +25,7 @@ export default function DateFilter({ onFilter }: Props) {
           Search by Date
         </label>
         <input
-        title="date"
+          title="date"
           type="date"
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.target.value)}

@@ -1,8 +1,5 @@
 'use client';
 
-import { Book, History } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useState } from 'react';
 
 export default function RakshakHomepage() {
@@ -19,7 +16,6 @@ export default function RakshakHomepage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2b0f3a] via-[#1f082a] to-black text-white">
 
-      {/* Navbar */}
      
 
       {/* Hero Section */}
