@@ -9,7 +9,7 @@ export default function Header() {
 
 
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="relative w-5 h-5 sm:w-10 sm:h-10">
+                    <div className="relative w-6 h-6 sm:w-10 sm:h-10">
                         <Image
                             src="/rakshak.png"
                             alt="Rakshak Logo"
@@ -27,16 +27,16 @@ export default function Header() {
 
                     <Link
                         href="/sos"
-                        className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 hover:text-pink-500 transition"
+                        className="flex flex-col sm:flex-row text-white items-center gap-1 sm:gap-2 hover:bg-pink-600 ring-2 ring-accent rounded-full p-1 transition"
                     >
-                        <History size={22} color="white" />
+                        <History size={22} />
                     </Link>
 
                     <Link
                         href="/documentation"
-                        className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 hover:text-pink-500 transition"
+                        className="flex flex-col sm:flex-row items-center text-white gap-1 sm:gap-2 hover:bg-pink-600 transition  ring-2 ring-accent rounded-full p-1"
                     >
-                        <Book size={22} color="white" />
+                        <Book size={22} />
                     </Link>
 
                 </div>
