@@ -421,7 +421,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-blue-50 to-indigo-100 justify-center py-8 px-3 sm:px-6">
+    <div className="min-h-screen flex bg-amber-100 justify-center py-8 px-3 sm:px-6">
       <main className="w-full max-w-2xl md:max-w-4xl bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg border border-white/30 p-5 sm:p-8 ">
         {/* Header */}
         <div className="text-center mb-8 flex flex-col items-center">

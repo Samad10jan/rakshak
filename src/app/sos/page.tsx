@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import DateFilter from "@/components/DateFilter";
 import Image from "next/image";
 import { Clock, Pin } from "lucide-react";
+import Loading from "@/components/Loading";
+import Error from "@/components/Error";
 
 type Sos = {
     id: string;
@@ -169,12 +171,7 @@ export default function SosHistoryPage() {
 
     if (loading)
         return (
-            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-                <div className="text-center">
-                    <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-r-transparent"></div>
-                    <p className="mt-4 text-lg text-gray-700">Loading...</p>
-                </div>
-            </div>
+           <Loading/>
         );
 
     if (!user)
@@ -224,9 +221,7 @@ export default function SosHistoryPage() {
 
     if (error)
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <p className="text-red-500 text-lg">{error}</p>
-            </div>
+            <Error error={error}/>
         );
 
     if (sosHistory.length === 0)
@@ -262,16 +257,18 @@ export default function SosHistoryPage() {
                 </div>
             )}
 
-            <div className="h-full bg-gradient-to-br from-blue-50 to-indigo-100 px-3 sm:px-6 lg:px-10 py-6">
+            <div className="min-h-screen bg-amber-100 px-3 sm:px-6 lg:px-10 py-6">
                 <div className="max-w-6xl mx-auto">
 
                     {/* Heading */}
-                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 flex items-center gap-2">
-                        <Clock color="blue" size={40}/> Your SOS History
-                    </h1>
+                    <div className=" flex justify-center items-center gap-4 text-xl md:text-4xl mb-8 mt-2">
+                        
+                            <Clock color="red" size={40}/> Your SOS History
+                        
+                    </div>
 
                     {/* Date Filter */}
-                    <div className="mb-5 sticky top-5 *:bg-white z-99">
+                    <div className="sticky top-10 *:bg-white z-99 w-fit mx-auto">
                         <DateFilter onFilter={handleDateFilter} />
                     </div>
 

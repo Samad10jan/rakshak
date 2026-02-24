@@ -7,6 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import Loading from "@/components/Loading";
+import type { CSSProperties } from "react";
+import Error from "@/components/Error";
 
 type Sos = {
   id: string;
@@ -101,16 +104,12 @@ export default function SosAlertPage() {
 
   if (loading)
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        Loading SOS alert...
-      </div>
+      <Loading />
     );
 
   if (error)
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        {error}
-      </div>
+      <Error error={error} />
     );
 
   if (!sos) return null;
@@ -134,12 +133,11 @@ export default function SosAlertPage() {
         </div>
       )}
 
-      <div className="min-h-screen p-6 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
+      <div className="min-h-screen p-6 bg-amber-100">
         <div className="max-w-5xl mx-auto">
           <Card>
             <CardContent className="p-6 space-y-6">
 
-              {/* Status */}
               <div
                 className={`${getStatusColor(
                   sos.status
@@ -170,7 +168,6 @@ export default function SosAlertPage() {
                 </Button>
               </div>
 
-              {/* Location */}
               {sos.location && (
                 <div className="space-y-4">
                   <h3 className="font-bold text-lg">Location</h3>
@@ -187,6 +184,7 @@ export default function SosAlertPage() {
                   </div>
 
                   <iframe
+                    title="SOS Alert Location Map"
                     width="100%"
                     height="300"
                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${sos.location.lng - 0.01
@@ -198,7 +196,6 @@ export default function SosAlertPage() {
                 </div>
               )}
 
-              {/* Media */}
               {sos.media.length > 0 && (
                 <div className="space-y-4">
                   <h3 className="font-bold text-lg">Media</h3>

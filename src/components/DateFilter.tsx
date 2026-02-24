@@ -19,7 +19,7 @@ export default function DateFilter({ onFilter }: Props) {
   }, [selectedDate, onFilter]);
 
   return (
-    <div className="bg-white shadow-md rounded-xl p-4 mb-6 flex flex-col sm:flex-row gap-4 sm:items-end">
+    <div className="bg-white shadow-md rounded-xl p-4 mb-5 scale-80 flex flex-col sm:flex-row gap-4 sm:items-end">
       <div className="flex flex-col w-full sm:w-auto">
         <label className="text-sm font-medium text-gray-600 mb-1">
           Search by Date

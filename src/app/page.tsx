@@ -20,47 +20,7 @@ export default function RakshakHomepage() {
     <div className="min-h-screen bg-gradient-to-br from-[#2b0f3a] via-[#1f082a] to-black text-white">
 
       {/* Navbar */}
-      <nav className="w-full border-b border-pink-500/30 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-
-          {/* Logo + Brand */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="relative w-8 h-8 sm:w-10 sm:h-10">
-              <Image
-                src="/rakshak.png"
-                alt="Rakshak Logo"
-                fill
-                className="object-cover rounded"
-                loading="lazy"
-              />
-            </div>
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-pink-500">
-              Rakshak
-            </h1>
-          </Link>
-
-          {/* Navigation Links */}
-          <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm md:text-base">
-
-            <Link
-              href="/sos"
-              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 hover:text-pink-500 transition"
-            >
-              <History size={18} />
-              <span>SOS History</span>
-            </Link>
-
-            <Link
-              href="/documentation"
-              className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 hover:text-pink-500 transition"
-            >
-              <Book size={18} />
-              <span>Documentation</span>
-            </Link>
-
-          </div>
-        </div>
-      </nav>
+     
 
       {/* Hero Section */}
       <section className="text-center px-6 py-20">
