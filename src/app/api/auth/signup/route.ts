@@ -4,12 +4,12 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
 
-// ✅ Handle preflight requests (browser sends this automatically)
+//  Handle preflight requests (browser sends this automatically)
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
-// ✅ Main Signup Route
+// Main Signup Route
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
         password,
         details: {
           create: {
-            message: "HELP!!", // default message
+            codeWord:"help", // default code word
+            message: "HELP!!! I am in danger.", // default message
           },
         },
       },

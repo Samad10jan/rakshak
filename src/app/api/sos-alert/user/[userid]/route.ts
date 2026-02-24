@@ -6,6 +6,7 @@ export async function OPTIONS() {
   // Handle preflight requests
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ userid: string }> }) {
   try {
     const { userid } = await params;

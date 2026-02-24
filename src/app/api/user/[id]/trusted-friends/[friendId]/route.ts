@@ -8,8 +8,9 @@ export async function OPTIONS() {
 }
 // /api/user/[id]/trusted-friends/[friendId]
 //  PUT update friend info
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ friendId: string }> }
-) {
+
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ friendId: string }> })
+ {
     try {
         const param = await params;
 

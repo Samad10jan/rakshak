@@ -6,7 +6,7 @@ export async function OPTIONS() {
   // Handle preflight requests
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
-// ✅ GET specific SOS by ID
+//  GET specific SOS by ID
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;

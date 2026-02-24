@@ -6,9 +6,8 @@ export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
-// =============================
 // CREATE SOS ALERT (POST)
-// =============================
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -64,9 +63,8 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// =============================
 // ADMIN — GET ALL SOS ALERTS
-// =============================
+
 export async function GET() {
   try {
     const allSOS = await prisma.sOSAlert.findMany({
