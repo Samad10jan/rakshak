@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { MapPin, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 type Sos = {
   id: string;
@@ -36,14 +37,14 @@ export default function SosAlertPage() {
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState(false);
 
-  const isMounted = useRef(true);
+  // const isMounted = useRef(true);
 
   /* ---------------- FETCH + POLLING ---------------- */
 
   useEffect(() => {
     if (!sosId) return;
 
-    isMounted.current = true;
+    // isMounted.current = true;
     setLoading(true);
 
     const getSos = async () => {
@@ -55,31 +56,31 @@ export default function SosAlertPage() {
         const data = await res.json();
 
         if (!res.ok) {
-          if (isMounted.current) {
-            setError(data.message || "Failed to fetch SOS");
-            setSos(null);
-          }
+
+          setError(data.message || "Failed to fetch SOS");
+          setSos(null);
+
           return;
         }
 
-        if (!isMounted.current) return;
-
-        if (data.sos.status === "active") {
-          setSos(data.sos);
-          setError(null);
-        } else {
-          setSos(null);
-          setError("This SOS alert is no longer active");
-        }
+        // if (!isMounted.current) return;
+        setSos(data.sos);
+        // if (data.sos.status) {
+        //   setSos(data.sos);
+        //   setError(null);
+        // } else {
+        //   setSos(null);
+        //   setError("This SOS alert is no longer active");
+        // }
       } catch (err: any) {
-        if (isMounted.current) {
-          setError(err.message || "Something went wrong");
-          setSos(null);
-        }
+
+        setError(err.message || "Something went wrong");
+        setSos(null);
+
       } finally {
-        if (isMounted.current) {
-          setLoading(false);
-        }
+
+        setLoading(false);
+
       }
     };
 
@@ -88,7 +89,7 @@ export default function SosAlertPage() {
     const intervalId = setInterval(getSos, 30000);
 
     return () => {
-      isMounted.current = false;
+      // isMounted.current = false;
       clearInterval(intervalId);
     };
   }, [sosId]);
@@ -116,7 +117,9 @@ export default function SosAlertPage() {
 
   const copyToClipboard = async (text: string) => {
     try {
+
       await navigator.clipboard.writeText(text);
+
       setCopiedId(true);
       setTimeout(() => setCopiedId(false), 2000);
     } catch {
@@ -124,7 +127,6 @@ export default function SosAlertPage() {
     }
   };
 
-  /* ---------------- STATES ---------------- */
 
   if (loading) return <Loading />;
 
@@ -132,23 +134,29 @@ export default function SosAlertPage() {
 
   if (!sos) return null;
 
-  /* ---------------- UI (UNCHANGED) ---------------- */
 
   return (
     <>
       {fullScreenImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center"
+          className="fixed inset-0 z-55 bg-black/70 flex items-center justify-center p-3 sm:p-6"
           onClick={() => setFullScreenImage(null)}
         >
-          <div className="relative w-full h-full max-w-6xl max-h-[90vh]">
+          <div
+            className="relative w-full max-w-xl h-[75vh] sm:h-[85vh] bg-neutral-700"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Image
               src={fullScreenImage}
-              alt="Fullscreen"
+              alt="Fullscreen image"
               fill
               className="object-contain"
+              sizes="100vw"
+              priority
             />
           </div>
+          <Button onClick={() => setFullScreenImage(null)} className="rounded-full hover:bg-red-500 text-white absolute top-0 right-0 m-5 text-center ring-2 active:bg-red-500 ring-red-500 transtion-all duration-300"><XIcon /></Button>
+
         </div>
       )}
 
@@ -170,9 +178,7 @@ export default function SosAlertPage() {
                     {new Date(sos.timestamp).toLocaleString()}
                   </p>
                 </div>
-                <Badge className="bg-white text-red-600">
-                  URGENT
-                </Badge>
+                {sos.status === "active" && <Badge className="bg-white text-red-600">URGENT</Badge>}
               </div>
 
               <div>
@@ -211,6 +217,15 @@ export default function SosAlertPage() {
                       }&layer=mapnik&marker=${sos.location.lat}%2C${sos.location.lng
                       }`}
                   />
+                  <a href={`https://www.google.com/maps?q=${sos.location.lat},${sos.location.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button size="sm" variant="outline">
+                      <MapPin size={14} /> Open in GoogleMaps
+                    </Button>
+                  </a>
+                  {/* <div className="bg-linaer text-clip">AA</div> */}
                 </div>
               )}
 
@@ -219,7 +234,7 @@ export default function SosAlertPage() {
                   <h3 className="font-bold text-lg">Media</h3>
 
                   <ScrollArea className="w-full">
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 flex-wrap">
                       {sos.media.map((m) => (
                         <Card key={m.id} className="w-64 flex-shrink-0">
                           <CardContent className="p-4 space-y-2">
@@ -264,7 +279,7 @@ export default function SosAlertPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </div >
     </>
   );
 }
