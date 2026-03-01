@@ -217,14 +217,16 @@ export default function SosAlertPage() {
                       }&layer=mapnik&marker=${sos.location.lat}%2C${sos.location.lng
                       }`}
                   />
+                  {sos.status !== "active" &&  
                   <a href={`https://www.google.com/maps?q=${sos.location.lat},${sos.location.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                    target="_blank">
+
                     <Button size="sm" variant="outline">
                       <MapPin size={14} /> Open in GoogleMaps
                     </Button>
-                  </a>
+                  </a>}
+
+                 
                   {/* <div className="bg-linaer text-clip">AA</div> */}
                 </div>
               )}
