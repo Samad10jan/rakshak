@@ -129,17 +129,6 @@ export default function SosHistoryPage() {
         }
     };
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "active":
-                return "green";
-            case "inactive":
-                return "gray";
-            default:
-                return "gray";
-        }
-    };
-
     /* ---------------- STATES ---------------- */
 
     if (loading) return <Loading />;
@@ -196,7 +185,7 @@ export default function SosHistoryPage() {
                         <DateFilter onFilter={handleDateFilter} />
                     </div>
 
-                    {/* Scrollable Area */}
+                  
                     <div className="">
                         <div className="h-full pr-2 sm:pr-4">
                             <div className="space-y-4 sm:space-y-6">
