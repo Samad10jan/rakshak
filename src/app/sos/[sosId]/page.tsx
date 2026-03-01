@@ -217,66 +217,55 @@ export default function SosAlertPage() {
                       }&layer=mapnik&marker=${sos.location.lat}%2C${sos.location.lng
                       }`}
                   />
-                  {sos.status !== "active" &&  
-                  <a href={`https://www.google.com/maps?q=${sos.location.lat},${sos.location.lng}`}
-                    target="_blank">
+                  {sos.status !== "active" &&
+                    <a href={`https://www.google.com/maps?q=${sos.location.lat},${sos.location.lng}`}
+                      target="_blank">
 
-                    <Button size="sm" variant="outline">
-                      <MapPin size={14} /> Open in GoogleMaps
-                    </Button>
-                  </a>}
+                      <Button size="sm" variant="outline">
+                        <MapPin size={14} /> Open in GoogleMaps
+                      </Button>
+                    </a>}
 
-                 
+
                   {/* <div className="bg-linaer text-clip">AA</div> */}
                 </div>
               )}
 
+
               {sos.media.length > 0 && (
-                <div className="space-y-4">
-                  <h3 className="font-bold text-lg">Media</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  {sos.media.map((m) => (
+                    <div key={m.id}>
 
-                  <ScrollArea className="w-full">
-                    <div className="flex gap-4 flex-wrap">
-                      {sos.media.map((m) => (
-                        <Card key={m.id} className="w-64 flex-shrink-0">
-                          <CardContent className="p-4 space-y-2">
+                      {m.type === "photo" && (
+                        <div
+                          className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden cursor-pointer"
+                          onClick={() => setFullScreenImage(m.url)}
+                        >
+                          <Image
+                            src={m.url}
+                            alt="SOS photo"
+                            fill
+                            className="object-cover hover:scale-105 transition-transform duration-300"
+                            sizes="(max-width: 640px) 100vw, 50vw"
+                          />
+                        </div>
+                      )}
 
-                            {m.type === "photo" && (
-                              <div
-                                className="relative w-full h-40 cursor-pointer"
-                                onClick={() =>
-                                  setFullScreenImage(m.url)
-                                }
-                              >
-                                <Image
-                                  src={m.url}
-                                  alt="SOS media"
-                                  fill
-                                  className="object-cover rounded"
-                                />
-                              </div>
-                            )}
+                      {m.type === "audio" && (
+                        <audio
+                          src={m.url}
+                          controls
+                          className="w-full"
+                        />
+                      )}
 
-                            {m.type === "audio" && (
-                              <audio controls className="w-full">
-                                <source
-                                  src={m.url}
-                                  type={`audio/${m.format}`}
-                                />
-                              </audio>
-                            )}
-
-                            <div className="text-sm">
-                              {m.type} ({m.format})
-                            </div>
-
-                          </CardContent>
-                        </Card>
-                      ))}
                     </div>
-                  </ScrollArea>
+                  ))}
                 </div>
               )}
+
+
 
             </CardContent>
           </Card>
