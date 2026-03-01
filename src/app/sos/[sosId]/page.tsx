@@ -5,27 +5,13 @@ import Loading from "@/components/Loading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Sos } from "@/lib/types";
 import { MapPin, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type Sos = {
-  id: string;
-  status: "active" | "inactive";
-  location?: { lat: number; lng: number } | null;
-  timestamp: string;
-  media: {
-    id: string;
-    url: string;
-    type: "photo" | "video" | "audio";
-    format: string;
-    duration?: number;
-    width?: number;
-    height?: number;
-  }[];
-};
+
 
 export default function SosAlertPage() {
   const params = useParams();
@@ -264,9 +250,6 @@ export default function SosAlertPage() {
                   ))}
                 </div>
               )}
-
-
-
             </CardContent>
           </Card>
         </div>

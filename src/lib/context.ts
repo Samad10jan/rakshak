@@ -5,8 +5,8 @@ import { verifyToken } from "./jwt";
 
 export async function getUserIdFromCookie(): Promise<string | null> {
     
-  const cookieStore = cookies();
-  const token = (await cookieStore).get("token")?.value;
+  const cookieStore =  await cookies();
+  const token = cookieStore.get("token")?.value;
 
   if (!token) return null;
 

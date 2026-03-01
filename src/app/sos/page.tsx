@@ -7,30 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getUserIdFromCookie } from "@/lib/context";
-import { Clock, Pin, XIcon } from "lucide-react";
+import { Sos, User } from "@/lib/types";
+import { ArrowBigRightDash, ArrowRight, Clock, MapIcon, MapPinIcon, Pin, XIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-
-type Sos = {
-    id: string;
-    status: "active" | "inactive";
-    location?: { lat: number; lng: number } | null;
-    timestamp: string;
-    media: {
-        id: string;
-        url: string;
-        type: "photo" | "video" | "audio";
-        format: string;
-        duration?: number;
-    }[];
-};
-
-type User = {
-    id: string;
-    username: string;
-    phoneNumber: string;
-};
 
 export default function SosHistoryPage() {
     const [sosHistory, setSosHistory] = useState<Sos[]>([]);
@@ -40,14 +22,10 @@ export default function SosHistoryPage() {
     const [user, setUser] = useState<User | null>(null);
     const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
     const router = useRouter();
+    const [copiedId, setCopiedId] = useState(false);
+
 
     /* ---------------- INITIAL LOAD ---------------- */
-
-    useEffect(() => {
-        if (!loading && !user) {
-            router.replace("/login");
-        }
-    }, [loading, user, router]);
 
     useEffect(() => {
 
@@ -71,6 +49,13 @@ export default function SosHistoryPage() {
         }
         getData()
     }, []);
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.replace("/login");
+        }
+    }, [loading, user, router]);
+
 
     /* ---------------- ESC CLOSE FULLSCREEN ---------------- */
 
@@ -101,7 +86,7 @@ export default function SosHistoryPage() {
 
             setSosHistory(data.sosHistory);
             setFilteredHistory(data.sosHistory);
-            setUser({ id: userId, username: "", phoneNumber: "" });
+            setUser({ id: userId, username: "", phoneNumber: "", email: "" });
         } catch (err: any) {
             setError(err.message || "Something went wrong");
         } finally {
@@ -109,7 +94,6 @@ export default function SosHistoryPage() {
         }
     };
 
-    /* ---------------- DATE FILTER (STABLE) ---------------- */
 
     const handleDateFilter = useCallback(
         (date: string | null) => {
@@ -131,8 +115,19 @@ export default function SosHistoryPage() {
         [sosHistory]
     );
 
+    /* ---------------- COPY ---------------- */
 
-    /* ---------------- STATUS COLOR ---------------- */
+    const copyToClipboard = async (text: string) => {
+        try {
+
+            await navigator.clipboard.writeText(text);
+
+            setCopiedId(true);
+            setTimeout(() => setCopiedId(false), 2000);
+        } catch {
+            console.error("Failed to copy");
+        }
+    };
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -206,36 +201,47 @@ export default function SosHistoryPage() {
                         <div className="h-full pr-2 sm:pr-4">
                             <div className="space-y-4 sm:space-y-6">
                                 {filteredHistory.map((sos) => (
-                                    <Card key={sos.id} className="shadow-lg">
+                                    <Card key={sos.id} className="shadow-lg relative">
+                                        <Link href={`/sos/${sos.id}`} className=" absolute top-2 right-5 rounded-full text-xs *:size-5 md:*:size-auto" title="sos page"><Button ><ArrowRight /></Button></Link>
                                         <CardContent className="p-4 sm:p-6">
-
-                                            {/* Top Row */}
+                                           
+                                            <Badge
+                                                variant={sos.status !== "active" ? "secondary" : "destructive"}
+                                                className=" w-fit absolute top-2 left-2 "
+                                            >
+                                                {sos.status.toUpperCase()}
+                                            </Badge>
+                                        
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                                <p className="font-mono text-xs sm:text-sm break-all">
-                                                    {sos.id}
-                                                </p>
+                                                <div className="">
+                                                    <p className="text-sm text-gray-500">Alert ID</p>
+                                                    <p className="font-mono break-all">{sos.id}</p>
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() => copyToClipboard(sos.id)}
+                                                    >
+                                                        {copiedId ? "Copied" : "Copy"}
+                                                    </Button>
+                                                </div>
 
-                                                <Badge
-                                                    style={{
-                                                        backgroundColor: getStatusColor(sos.status),
-                                                    }}
-                                                    className="text-white w-fit"
-                                                >
-                                                    {sos.status.toUpperCase()}
-                                                </Badge>
+
                                             </div>
 
-                                            {/* Timestamp */}
-                                            <p className="text-sm sm:text-base mb-3">
-                                                {new Date(sos.timestamp).toLocaleString()}
-                                            </p>
 
-                                            {/* Location */}
-                                            {sos.location && (
-                                                <div className="text-sm sm:text-base mb-4 break-all flex items-center gap-2">
-                                                    <Pin size={15} color="red" /> {sos.location.lat}, {sos.location.lng}
+                                            {/* Timestamp */}
+                                            <div className=" flex justify-between flex-wrap">
+                                                <div className="text-sm sm:text-base mb-3">
+                                                    <p className="font-bold">Last Active Time:</p>
+                                                    {new Date(sos.timestamp).toLocaleString()}
                                                 </div>
-                                            )}
+
+                                                {/* Location */}
+                                                {sos.location && (
+                                                    <div className="text-xs md:text-base mb-4 flex items-center justify-center gap-2  wrap-break-word text">
+                                                        <p className="font-bold">Coordinates:</p> Lat:{sos.location.lat}, Long:{sos.location.lng}
+                                                    </div>
+                                                )}
+                                            </div>
 
                                             {/* Media */}
                                             {sos.media.length > 0 && (
