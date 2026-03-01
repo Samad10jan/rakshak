@@ -1,16 +1,17 @@
 'use client';
 
+import { AlarmMinus, AlarmSmoke, AlarmSmokeIcon, BellIcon, CameraIcon, FileTextIcon, MapPinIcon, MicIcon } from 'lucide-react';
 import { useState } from 'react';
 
 export default function RakshakHomepage() {
   const [activeFeature, setActiveFeature] = useState<number | null>(null);
 
   const features = [
-    { icon: '🚨', title: 'Instant SOS', desc: 'Send emergency alert with one tap.' },
-    { icon: '📸', title: 'Photo & Audio', desc: 'Automatically capture images and record audio.' },
-    { icon: '📍', title: 'Live Location', desc: 'Share your live location with trusted contacts.' },
-    { icon: '🗣️', title: 'Voice SOS', desc: 'Activate SOS using your secret code word.' },
-    { icon: '📜', title: 'SOS History', desc: 'View all your past SOS alerts.' },
+    { icon:<BellIcon  /> , title: 'Instant SOS', desc: 'Send emergency alert with one tap.' },
+    { icon: <CameraIcon />, title: 'Photo & Audio', desc: 'Automatically capture images and record audio.' },
+    { icon:<MapPinIcon  />, title: 'Live Location', desc: 'Share your live location with trusted contacts.' },
+    { icon: <MicIcon />, title: 'Voice SOS', desc: 'Activate SOS using your secret code word.' },
+    { icon: <FileTextIcon />, title: 'SOS History', desc: 'View all your past SOS alerts.' },
   ];
 
   return (
@@ -42,15 +43,11 @@ export default function RakshakHomepage() {
             <div
               key={index}
               onClick={() => setActiveFeature(index)}
-              className={`p-6 rounded-xl cursor-pointer transition-all border
-                ${activeFeature === index
-                  ? 'border-pink-500 bg-pink-500/10 shadow-lg shadow-pink-500/20'
-                  : 'border-purple-800 bg-purple-950/70 hover:border-pink-500/50'
-                }`}
+              className={`py-3 px-4  rounded-xl cursor-pointer transition-all border border-pink-600 flex flex-col items-center justify-center`}
             >
-              <div className="text-4xl mb-4">{feature.icon}</div>
-              <h4 className="text-xl font-semibold mb-2">{feature.title}</h4>
-              <p className="text-purple-300 text-sm">{feature.desc}</p>
+              <div className="text-4xl mb-4 flex justify-center md:justify-start *:text-pink-500 *:size-10">{feature.icon}</div>
+              <div className="text-xl font-semibold mb-2 text-center">{feature.title}</div>
+              <div className="text-purple-300 text-sm text-center">{feature.desc}</div>
             </div>
           ))}
         </div>
