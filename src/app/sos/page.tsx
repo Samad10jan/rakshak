@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getUserIdFromCookie } from "@/lib/context";
 import { Sos, User } from "@/lib/types";
-import { ArrowBigRightDash, ArrowRight, Clock, MapIcon, MapPinIcon, Pin, XIcon } from "lucide-react";
+import { ArrowRight, Clock, MapPin, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -185,93 +185,96 @@ export default function SosHistoryPage() {
                         <DateFilter onFilter={handleDateFilter} />
                     </div>
 
-                  
-                    <div className="">
-                        <div className="h-full pr-2 sm:pr-4">
-                            <div className="space-y-4 sm:space-y-6">
-                                {filteredHistory.map((sos) => (
-                                    <Card key={sos.id} className="shadow-lg relative">
-                                        <Link href={`/sos/${sos.id}`} className=" absolute top-2 right-5 rounded-full text-xs *:size-5 md:*:size-auto" title="sos page"><Button ><ArrowRight /></Button></Link>
-                                        <CardContent className="p-4 sm:p-6">
-                                           
-                                            <Badge
-                                                variant={sos.status !== "active" ? "secondary" : "destructive"}
-                                                className=" w-fit absolute top-2 left-2 "
-                                            >
-                                                {sos.status.toUpperCase()}
-                                            </Badge>
-                                        
-                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                                <div className="">
-                                                    <p className="text-sm text-gray-500">Alert ID</p>
-                                                    <p className="font-mono break-all">{sos.id}</p>
-                                                    <Button
-                                                        size="sm"
-                                                        onClick={() => copyToClipboard(sos.id)}
-                                                    >
-                                                        {copiedId ? "Copied" : "Copy"}
+
+
+                    <div className="h-full pr-2 sm:pr-4">
+                        <div className="space-y-4 sm:space-y-6">
+                            {filteredHistory.map((sos) => (
+                                <Card key={sos.id} className="shadow-lg relative">
+                                    <Link href={`/sos/${sos.id}`} className=" absolute top-2 right-5 rounded-full text-xs *:size-5 md:*:size-auto" title="sos page"><Button ><ArrowRight /></Button></Link>
+                                    <CardContent className="p-4 sm:p-6">
+
+                                        <Badge
+                                            variant={sos.status !== "active" ? "secondary" : "destructive"}
+                                            className=" w-fit absolute top-2 left-2 "
+                                        >
+                                            {sos.status.toUpperCase()}
+                                        </Badge>
+
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                                            <div className="">
+                                                <p className="text-sm text-gray-500">Alert ID</p>
+                                                <p className="font-mono break-keep text-xs md:text-base">{sos.id}</p>
+                                                <Button
+
+                                                    onClick={() => copyToClipboard(sos.id)}
+                                                    className="font-mono rounded-full text-xs size-5 md:size-auto  "
+                                                >
+                                                    {copiedId ? "Copied" : "Copy"}
+                                                </Button>
+                                            </div>
+
+
+                                        </div>
+
+
+                                        <div className=" flex justify-between flex-wrap">
+                                            <div className="text-sm sm:text-base mb-3">
+                                                <p className="font-bold">Last Active Time:</p>
+                                                {new Date(sos.timestamp).toLocaleString()}
+                                            </div>
+
+                                            {/* Location */}
+                                            {sos.status !== "active" &&
+                                                <a href={`https://www.google.com/maps?q=${sos?.location?.lat},${sos?.location?.lng}`}
+                                                    target="_blank">
+
+                                                    <Button size="sm" variant="outline" className="text-xs md:text-base mb-3">
+                                                        <MapPin size={14} /> Open in GoogleMaps
                                                     </Button>
-                                                </div>
+                                                </a>}
+                                        </div>
 
+                                        {/* Media */}
+                                        {sos.media.length > 0 && (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                                {sos.media.map((m) => (
+                                                    <div key={m.id}>
 
-                                            </div>
-
-
-                                            {/* Timestamp */}
-                                            <div className=" flex justify-between flex-wrap">
-                                                <div className="text-sm sm:text-base mb-3">
-                                                    <p className="font-bold">Last Active Time:</p>
-                                                    {new Date(sos.timestamp).toLocaleString()}
-                                                </div>
-
-                                                {/* Location */}
-                                                {sos.location && (
-                                                    <div className="text-xs md:text-base mb-4 flex items-center justify-center gap-2  wrap-break-word text">
-                                                        <p className="font-bold">Coordinates:</p> Lat:{sos.location.lat}, Long:{sos.location.lng}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Media */}
-                                            {sos.media.length > 0 && (
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                                                    {sos.media.map((m) => (
-                                                        <div key={m.id}>
-
-                                                            {m.type === "photo" && (
-                                                                <div
-                                                                    className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden cursor-pointer"
-                                                                    onClick={() => setFullScreenImage(m.url)}
-                                                                >
-                                                                    <Image
-                                                                        src={m.url}
-                                                                        alt="SOS photo"
-                                                                        fill
-                                                                        className="object-cover hover:scale-105 transition-transform duration-300"
-                                                                        sizes="(max-width: 640px) 100vw, 50vw"
-                                                                    />
-                                                                </div>
-                                                            )}
-
-                                                            {m.type === "audio" && (
-                                                                <audio
+                                                        {m.type === "photo" && (
+                                                            <div
+                                                                className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden cursor-pointer"
+                                                                onClick={() => setFullScreenImage(m.url)}
+                                                            >
+                                                                <Image
                                                                     src={m.url}
-                                                                    controls
-                                                                    className="w-full"
+                                                                    alt="SOS photo"
+                                                                    fill
+                                                                    className="object-cover hover:scale-105 transition-transform duration-300"
+                                                                    sizes="(max-width: 640px) 100vw, 50vw"
                                                                 />
-                                                            )}
+                                                            </div>
+                                                        )}
 
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
+                                                        {m.type === "audio" && (
+                                                            <audio
+                                                                src={m.url}
+                                                                controls
+                                                                className="w-full"
+                                                            />
+                                                        )}
 
-                                        </CardContent>
-                                    </Card>
-                                ))}
-                            </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                    </CardContent>
+                                </Card>
+                            ))}
                         </div>
                     </div>
+
 
                 </div>
             </div>
