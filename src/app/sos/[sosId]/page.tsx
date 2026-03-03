@@ -23,62 +23,105 @@ export default function SosAlertPage() {
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState(false);
 
-  // const isMounted = useRef(true);
-
   /* ---------------- FETCH + POLLING ---------------- */
+
+  // useEffect(() => {
+  //   if (!sosId) return;
+
+  //   // isMounted.current = true;
+  //   setLoading(true);
+
+  //   const getSos = async () => {
+  //     try {
+  //       const res = await fetch(`/api/sos-alert/${sosId}`, {
+  //         cache: "no-store",
+  //       });
+
+  //       const data = await res.json();
+
+  //       if (!res.ok) {
+
+  //         setError(data.message || "Failed to fetch SOS");
+  //         setSos(null);
+
+  //         return;
+  //       }
+
+  //       // if (!isMounted.current) return;
+  //       setSos(data.sos);
+  //       // if (data.sos.status) {
+  //       //   setSos(data.sos);
+  //       //   setError(null);
+  //       // } else {
+  //       //   setSos(null);
+  //       //   setError("This SOS alert is no longer active");
+  //       // }
+  //     } catch (err: any) {
+
+  //       setError(err.message || "Something went wrong");
+  //       setSos(null);
+
+  //     } finally {
+
+  //       setLoading(false);
+
+  //     }
+  //   };
+
+  //   getSos();
+
+  //   const intervalId = setInterval(getSos, 30000);
+
+  //   return () => {
+  //     // isMounted.current = false;
+  //     clearInterval(intervalId);
+  //   };
+  // }, [sosId]);
 
   useEffect(() => {
     if (!sosId) return;
 
-    // isMounted.current = true;
-    setLoading(true);
-
     const getSos = async () => {
       try {
-        const res = await fetch(`/api/sos-alert/${sosId}`, {
-          cache: "no-store",
-        });
-
+        const res = await fetch(`/api/sos-alert/${sosId}`, { cache: "no-store" });
         const data = await res.json();
 
         if (!res.ok) {
-
           setError(data.message || "Failed to fetch SOS");
           setSos(null);
-
           return;
         }
+        // console.log("not interval");
 
-        // if (!isMounted.current) return;
         setSos(data.sos);
-        // if (data.sos.status) {
-        //   setSos(data.sos);
-        //   setError(null);
-        // } else {
-        //   setSos(null);
-        //   setError("This SOS alert is no longer active");
-        // }
+        setError(null);
       } catch (err: any) {
-
         setError(err.message || "Something went wrong");
         setSos(null);
-
       } finally {
-
         setLoading(false);
-
       }
     };
 
+    setLoading(true);
     getSos();
-
-    const intervalId = setInterval(getSos, 30000);
-
-    return () => {
-      // isMounted.current = false;
-      clearInterval(intervalId);
-    };
   }, [sosId]);
+
+  // separate effect for polling
+  useEffect(() => {
+    if (sos?.status !== "active") return;
+
+    const intervalId = setInterval(() => {
+      // console.log("intrrval");
+
+      fetch(`/api/sos-alert/${sos.id}`, { cache: "no-store" })
+        .then(res => res.json())
+        .then(data => setSos(data.sos))
+        .catch(err => setError(err.message || "Something went wrong"));
+    }, 20 * 1000);
+
+    return () => clearInterval(intervalId);
+  }, [sos]);
 
   /* ---------------- ESC CLOSE ---------------- */
 
@@ -146,15 +189,15 @@ export default function SosAlertPage() {
         </div>
       )}
 
-      <div className="min-h-screen p-6 bg-amber-100">
+      <div className="min-h-screen pt-3 bg-amber-100" >
         <div className="max-w-5xl mx-auto">
           <Card>
-            <CardContent className="p-6 space-y-6">
+            <CardContent className=" pt-2 space-y-6">
 
               <div
                 className={`${getStatusColor(
                   sos.status
-                )} text-white p-4 rounded-lg flex justify-between`}
+                )} text-white px-3 py-2 rounded-lg flex justify-between`}
               >
                 <div>
                   <p className="font-bold text-lg">
