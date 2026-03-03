@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sos } from "@/lib/types";
-import { MapPin, XIcon } from "lucide-react";
+import { Fullscreen, MapPin, XIcon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -261,36 +261,45 @@ export default function SosAlertPage() {
               )}
 
 
+              {/* Media */}
+              <div className="font-bold mb-2 text-center text-rose-700 text-xl">SOS Media</div>
+              
               {sos.media.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {sos.media.map((m) => (
-                    <div key={m.id}>
+                <div className="flex flex-col gap-4 flex-wrap ring-1 p-3 rounded-4xl">
+                  {sos.media
+                    .slice() // make a copy so we don’t mutate original
 
-                      {m.type === "photo" && (
-                        <div
-                          className="relative w-full h-48 sm:h-56 md:h-64 rounded-lg overflow-hidden cursor-pointer"
-                          onClick={() => setFullScreenImage(m.url)}
-                        >
-                          <Image
-                            src={m.url}
-                            alt="SOS photo"
-                            fill
-                            className="object-cover hover:scale-105 transition-transform duration-300"
-                            sizes="(max-width: 640px) 100vw, 50vw"
-                          />
-                        </div>
-                      )}
+                    .sort((a, b) => {
+                      // photos first, then audio
+                      if (a.type === "photo" && b.type === "audio") return -1;
+                      if (a.type === "audio" && b.type === "photo") return 1;
+                      return 0;
+                    })
+                    .map((m) => (
+                      <div key={m.id}>
+                        {m.type === "photo" && (
+                          <div
+                            className="group relative w-full h-38 sm:h-56 md:h-64 rounded-lg overflow-hidden cursor-pointer"
+                            onClick={() => setFullScreenImage(m.url)}
+                          >
+                            <Image
+                              src={m.url}
+                              alt="SOS photo"
+                              fill
+                              className="object-cover hover:scale-105 transition-transform duration-300"
+                              sizes="(max-width: 640px) 100vw, 50vw"
+                            />
+                            <div className="opacity-0 flex justify-center items-center group-hover:opacity-100 absolute inset-0 w-full z-10 bg-black/50 rounded-2xl p-1 transition-opacity duration-700">
+                              <Fullscreen color="white" />
+                            </div>
+                          </div>
+                        )}
 
-                      {m.type === "audio" && (
-                        <audio
-                          src={m.url}
-                          controls
-                          className="w-full"
-                        />
-                      )}
-
-                    </div>
-                  ))}
+                        {m.type === "audio" && (
+                          <audio src={m.url} controls className="w-full" />
+                        )}
+                      </div>
+                    ))}
                 </div>
               )}
             </CardContent>
