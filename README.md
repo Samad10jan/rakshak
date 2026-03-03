@@ -232,7 +232,7 @@ JWT_SECRET=...
 ### Install & Run
 
 ```bash
-git clone https://github.com/your-username/rakshak
+git clone https://github.com/Samad10jan/rakshak
 cd rakshak
 npm install
 npm run dev
