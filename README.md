@@ -200,13 +200,14 @@ description — string (optional)
 ---
 
 ## 🖥️ Web Dashboard Screenshots
+<!-- <img width="1895" height="952" alt="image" src="https://github.com/user-attachments/assets/b27232b3-813e-4ebe-9193-b1bdd4be0e51" /> -->
 
 | Page | Preview |
 |---|---|
 | Landing Page | ![Landing](https://github.com/user-attachments/assets/03444523-aa7e-4803-a476-27631e9d8e53) |
 | SOS History (with date filter) | ![SOS History](https://github.com/user-attachments/assets/4d2f6aad-cf43-4cf0-b5c5-e606cf8ebad0) |
 | Active SOS Alert | ![Active SOS](https://github.com/user-attachments/assets/d38c7f80-2b6c-43d2-983d-8bcabd162079) |
-| Individual SOS with Media | ![SOS Media](https://github.com/user-attachments/assets/c091f710-92ac-4fde-8605-d67bbc79ca3c) |
+| Individual SOS Page | ![SOS Media](https://github.com/user-attachments/assets/b27232b3-813e-4ebe-9193-b1bdd4be0e51) |
 | SOS Location Polling | ![Location Polling](https://github.com/user-attachments/assets/d825033f-8434-4a21-8248-c998ee5ce4dd) |
 | API Docs Page | ![API Docs](https://github.com/user-attachments/assets/8a46959e-c656-47a3-b826-10202f749dce) |
 
