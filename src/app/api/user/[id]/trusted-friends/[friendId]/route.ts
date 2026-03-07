@@ -1,3 +1,4 @@
+// src/app/api/user/[id]/trusted-friends/[friendId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { corsHeaders } from "@/lib/cors";

@@ -1,3 +1,4 @@
+// src/app/api/user/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { corsHeaders } from "@/lib/cors";
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             );
         }
 
-        return NextResponse.json({ success: true, user },{ status: 204, headers: corsHeaders });
+        return NextResponse.json({ success: true, user },{ status: 200, headers: corsHeaders });
     } catch (error: any) {
         return NextResponse.json(
             { success: false, message: "Error fetching user", error: error.message },

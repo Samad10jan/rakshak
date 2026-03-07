@@ -15,42 +15,51 @@ const API_BASE = "https://rakshak-gamma.vercel.app/api/";
 const ACCESS_CODE = "P20Rakshak";
 
 const apiList = [
+
   // 🔐 AUTH
   {
     path: "/api/auth/signup",
     method: "POST",
-    desc: "Register a new user account. Creates user with default details (message: 'HELP!!'). Required fields: email, username, phoneNumber.",
-    body: { email: "2001riya@gmail.com", username: "Riya", phoneNumber: "9827453783", password: "jkAbc!@12" },
+    desc: "Register a new user. Creates default userDetails with codeWord='help' and message='HELP!!! I am in danger.'",
+    body: {
+      username: "Riya",
+      email: "2001riya@gmail.com",
+      phoneNumber: "9827453783",
+      password: "jkAbc!@12"
+    },
     response: {
       success: true,
       message: "User registered successfully",
       user: {
-        id: "68fcc70c132244eaf83b68b0",
+        id: "userId",
         username: "Riya",
-        email: "2001riya@gmail.com@gmail.com",
+        email: "2001riya@gmail.com",
         phoneNumber: "9827453783",
-        createdAt: "2025-10-25T12:48:12.732Z",
+        createdAt: "2025-10-25T12:48:12.732Z"
       }
     },
     implemented: true
   },
+
   {
     path: "/api/auth/signin",
     method: "POST",
-    desc: "Sign in an existing user by phoneNumber. Returns user with all linked details.",
+    desc: "Authenticate user using phoneNumber and password. Returns user data and sets a JWT cookie (token).",
     body: {
-      password: "jkAbc!@12",
-      phoneNumber: "9827453733"
+      phoneNumber: "9827453733",
+      password: "jkAbc!@12"
     },
     response: {
-      "success": true,
-      "message": "Sign-in successful",
-      "user": {
-        "id": "68f857a510de027a2ec301e9",
-        "username": "Riya",
-        "email": "2001riya@gmail.com",
-        "phoneNumber": "9827453733",
-        "createdAt": "2025-10-22T04:03:49.653Z"
+      success: true,
+      message: "Sign-in successful",
+      user: {
+        id: "userId",
+        username: "Riya",
+        email: "2001riya@gmail.com",
+        phoneNumber: "9827453733",
+        details: {
+          codeWord: "help"
+        }
       }
     },
     implemented: true
@@ -60,16 +69,18 @@ const apiList = [
   {
     path: "/api/user/[id]",
     method: "GET, PUT, DELETE",
-    desc: "Fetch, update, or delete a user by ID. Includes linked details, friends, and SOS alerts. PUT Example Below,for GET and DELETE no body",
-    body: { username: "Updated Name", email: "updated@example.com" },
+    desc: "Fetch, update, or delete a user by ID.",
+    body: {
+      username: "Updated Name",
+      email: "updated@example.com"
+    },
     response: {
       success: true,
-      message: "User details updated successfully",
+      message: "User updated successfully",
       user: {
-        id: "abc123",
-        username: "Abdul Updated",
-        email: "updated@example.com",
-        details: { id: "67a99day987d9a", message: "HELP!!" }
+        id: "userId",
+        username: "Updated Name",
+        email: "updated@example.com"
       }
     },
     implemented: true
@@ -79,7 +90,7 @@ const apiList = [
   {
     path: "/api/user/[id]/details",
     method: "GET, PUT",
-    desc: "Fetch or update user details. Includes address, codeWord, message, and SOS/friends data.",
+    desc: "Fetch or update user details including permanentAddress, codeWord, and emergency message.",
     body: {
       permanentAddress: { lat: 12.9, lng: 77.6 },
       codeWord: "SafeHome",
@@ -89,7 +100,7 @@ const apiList = [
       success: true,
       message: "User details updated successfully",
       details: {
-        id: "details123",
+        id: "detailsId",
         permanentAddress: { lat: 12.9, lng: 77.6 },
         codeWord: "SafeHome",
         message: "I am in danger, please help!"
@@ -102,204 +113,145 @@ const apiList = [
   {
     path: "/api/user/[id]/trusted-friends",
     method: "GET, POST",
-    desc: "Get or add trusted friends for a user. Each friend has a name and phone number.",
-    body: { name: "Ali", phone: "9876543211" },
+    desc: "Get or add trusted emergency contacts for the user.",
+    body: {
+      name: "Ali",
+      phone: "9876543211"
+    },
     response: {
       success: true,
       message: "Friend added successfully",
-      friend: { id: "8s7d09as8d0a9", userDetailsId: "68f857a510de027a2ec301ea", name: "Ali", phone: "9876543211" }
-    },
-    implemented: true
-  },
-  {
-    path: "/api/user/[id]/trusted-friends/[friendId]",
-    method: "PUT, DELETE",
-    desc: "Edit or delete a specific trusted friend.",
-    body: { name: "Updated Friend", phone: "9998887776" },
-    response: {
-      success: true,
-      message: "Friend updated successfully",
-      friend: { id: "786s7dasbas7as", name: "Updated Friend", phone: "9998887776" }
+      friend: {
+        id: "friendId",
+        name: "Ali",
+        phone: "9876543211"
+      }
     },
     implemented: true
   },
 
-  // 📸 MEDIA
   {
-    path: "/api/user/[id]/media",
-    method: "GET",
-    desc: "Fetch all user media through related SOS alerts.",
-    response: [
-      { id: "890ddidjk..", type: "photo", url: "https://cloudinary.com/photo1.jpg" },
-      { id: "989sadasdkn..", type: "video", url: "https://cloudinary.com/video.mp4" }
-    ],
-    implemented: false
+    path: "/api/user/[id]/trusted-friends/[friendId]",
+    method: "PUT, DELETE",
+    desc: "Update or delete a trusted friend.",
+    body: {
+      name: "Updated Friend",
+      phone: "9998887776"
+    },
+    response: {
+      success: true,
+      message: "Friend updated successfully"
+    },
+    implemented: true
   },
 
   // 🚨 SOS ALERTS
   {
     path: "/api/sos-alert",
     method: "POST",
-    desc: "Create a new SOS alert with location coordinates linked to userDetailsId.",
+    desc: "Create a new SOS alert linked to userId.",
     body: {
-      "userId": "68ffa766ac0cd72ed42de692",
-      "location": { "lat": 12.9716, "lng": 77.5946 },
-      "status": "active"
+      userId: "userId",
+      location: { lat: 12.9716, lng: 77.5946 },
+      status: "active"
     },
     response: {
-      "success": true,
-      "message": "SOS alert created successfully",
-      "sos": {
-        "id": "6530a1f3b5c7da1a5a2b2cd9",
-        "userDetailsId": "652fbfe1b7a83db45b3ef342",
-        "timestamp": "2025-10-25T11:32:56.492Z",
-        "location": { "lat": 12.9716, "lng": 77.5946 },
-        "status": "active"
+      success: true,
+      message: "SOS alert created successfully",
+      sos: {
+        id: "sosId",
+        userDetailsId: "detailsId",
+        location: { lat: 12.9716, lng: 77.5946 },
+        status: "active"
       }
-    }
-    ,
+    },
     implemented: true
   },
+
+  {
+    path: "/api/sos-alert",
+    method: "GET",
+    desc: "Admin endpoint to fetch all SOS alerts.",
+    response: {
+      success: true,
+      total: 5,
+      allSOS: []
+    },
+    implemented: true
+  },
+
   {
     path: "/api/sos-alert/[id]",
     method: "GET, PUT, DELETE",
-    desc: "Get, update, or delete a specific SOS alert.",
+    desc: "Fetch, update, or delete a specific SOS alert.",
     body: {
-      "location": { "lat": 12.9720, "lng": 77.5952 },
-      "status": "active"
-    }
-    ,
+      location: { lat: 12.9720, lng: 77.5952 },
+      status: "inactive"
+    },
     response: {
-      "success": true,
-      "message": "SOS updated successfully",
-      "sos": {
-        "id": "6530a1f3b5c7da1a5a2b2cd9",
-        "timestamp": "2025-10-25T11:32:56.492Z",
-        "location": { "lat": 12.9720, "lng": 77.5952 },
-        "status": "active"
+      success: true,
+      message: "SOS updated successfully",
+      sos: {
+        id: "sosId",
+        status: "inactive"
       }
-    }
-
-    ,
+    },
     implemented: true
   },
+
   {
-    path: "/api/sos-alert/user/[userId]",
+    path: "/api/sos-alert/user/[userid]",
     method: "GET",
-    desc: "Fetch all SOS alerts belonging to a specific user.",
-    response: [
-      {
-        "success": true,
-        "total": 2,
-        "sosHistory": [
-          {
-            "id": "6530a1f3b5c7da1a5a2b2cd9",
-            "timestamp": "2025-10-25T11:32:56.492Z",
-            "status": "inactive",
-            "location": { "lat": 12.9716, "lng": 77.5946 },
-            "media": []
-          },
-          {
-            "id": "6530a1f3b5c7da1a5a2b2ce0",
-            "timestamp": "2025-10-25T12:00:23.492Z",
-            "status": "active",
-            "location": { "lat": 12.9719, "lng": 77.5950 },
-            "media": []
-          }
-        ]
-      }
-
-    ],
+    desc: "Fetch SOS history of a user including media.",
+    response: {
+      success: true,
+      total: 2,
+      sosHistory: []
+    },
     implemented: true
   },
 
-  // 🗂️ MEDIA MANAGEMENT
-
+  // 📸 MEDIA
   {
     path: "/api/media/upload",
     method: "POST",
-    desc: `
-Upload multiple media files (photos and/or a single audio) linked to an SOS alert.
-- Images are uploaded to Cloudinary folder: Rakshak_uploads/images
-- Audio is uploaded to Cloudinary folder: Rakshak_uploads/audio
-- Max image size: 13 MB
-- Max audio size: 15 MB
-- Metadata (sosAlertId & timestamp) is stored in Cloudinary context
-- Media metadata is saved in MongoDB (Media collection) linked to SOSAlert
-- Metadata (title & description) is optional and also stored in Cloudinary context
-`,
+    desc: "Upload SOS images and optional audio using multipart/form-data. Images stored in Cloudinary folder Rakshak_uploads/images and audio in Rakshak_uploads/audio.",
     body: {
-      sosAlertId: "string",          // ID of the SOSAlert to attach media
-      files: "File[]",               // Multiple image files
-      audio: "File (optional)",      // Single audio file
-      title: "string (optional)",    // Metadata title
-      description: "string (optional)" // Metadata description
+      sosAlertId: "string",
+      files: "File[]",
+      audio: "File (optional)"
     },
     response: {
       uploaded: [
         {
-          id: "string",            // Media ID in database
-          sosAlertId: "string",    // Linked SOSAlert ID
-          type: "photo | audio",   // Media type
-          publicId: "string",      // Cloudinary public_id
-          url: "string",           // Secure Cloudinary URL
-          format: "string",        // File format
-          width: "number (optional, for images)",
-          height: "number (optional, for images)",
-          duration: "number (optional, for audio)",
-          uploadedAt: "DateTime",
-          metadata: {              // Cloudinary context metadata
-            sosAlertId: "string",
-            timestamp: "string",
-            title: "string",
-            description: "string"
-          }
+          id: "mediaId",
+          type: "photo",
+          url: "https://cloudinary.com/file.jpg",
+          format: "jpg"
         }
       ]
     },
     implemented: true
   },
-  {
-    path: "/api/media/[id]",
-    method: "GET, DELETE",
-    desc: "Fetch or delete specific media using its ID. DELETE removes both MongoDB record and Cloudinary file.",
-    response: {
-      success: true,
-      message: "Media deleted successfully or fetched media object"
-    },
-    implemented: true
-  }
-  ,
 
   {
     path: "/api/media/[id]",
     method: "GET",
-    desc: `
-Fetch all media linked to a specific SOSAlert by its ID.
-- Returns all photos and audio associated with the SOSAlert
-- Media includes URL, publicId, format, type, and metadata
-`,
-    params: {
-      id: "string (SOSAlert ID)"
-    },
+    desc: "Fetch all media linked to a specific SOSAlert ID.",
     response: {
       media: [
         {
-          id: "string",
-          sosAlertId: "string",
-          type: "photo | audio",
-          publicId: "string",
-          url: "string",
-          format: "string",
-          width: "number (optional)",
-          height: "number (optional)",
-          duration: "number (optional)",
-          uploadedAt: "DateTime"
+          id: "mediaId",
+          sosAlertId: "sosId",
+          type: "photo",
+          url: "https://cloudinary.com/file.jpg",
+          uploadedAt: "Date"
         }
       ]
     },
     implemented: true
-  },
+  }
+
 ];
 
 interface ApiEndpoint {

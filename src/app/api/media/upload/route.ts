@@ -1,3 +1,4 @@
+// src/app/api/media/upload/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import cloudinary from '@/lib/cloudinary';
 import prisma from '@/lib/prisma';
