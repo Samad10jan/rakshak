@@ -52,8 +52,8 @@ All endpoints are prefixed with `https://rakshak-gamma.vercel.app/api/`
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/auth/signup` | Register a new user. Required: `email`, `username`, `phoneNumber`, `password` |
-| `POST` | `/auth/signin` | Sign in by phone number and password |
+| `POST` | `/auth/signup` | Register a new user. Required: `email`, `username`, `phoneNumber`, `password`. Automatically creates userDetails with default emergency settings. |
+| `POST` | `/auth/signin` | Sign in using `phoneNumber` and `password`. Returns user data and sets a JWT cookie (`token`). |
 
 <details>
 <summary>Signup example</summary>
@@ -91,7 +91,7 @@ All endpoints are prefixed with `https://rakshak-gamma.vercel.app/api/`
 | Method | Endpoint | Description |
 |---|---|---|
 | `GET / PUT / DELETE` | `/user/[id]` | Fetch, update, or delete a user by ID |
-| `GET / PUT` | `/user/[id]/details` | Fetch or update user details (address, codeWord, message) |
+| `GET / PUT` | `/user/[id]/details` | Fetch or update user details including `permanentAddress`, `codeWord`, and emergency `message` |
 
 ---
 
@@ -115,7 +115,11 @@ All endpoints are prefixed with `https://rakshak-gamma.vercel.app/api/`
 {
   "success": true,
   "message": "Friend added successfully",
-  "friend": { "id": "8s7d09as8d0a9", "name": "Ali", "phone": "9876543211" }
+  "friend": {
+    "id": "8s7d09as8d0a9",
+    "name": "Ali",
+    "phone": "9876543211"
+  }
 }
 ```
 </details>
@@ -126,9 +130,10 @@ All endpoints are prefixed with `https://rakshak-gamma.vercel.app/api/`
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/sos-alert` | Create a new SOS alert with GPS coordinates |
-| `GET / PUT / DELETE` | `/sos-alert/[id]` | Manage a specific SOS alert |
-| `GET` | `/sos-alert/user/[userId]` | Fetch all SOS alerts for a user |
+| `POST` | `/sos-alert` | Create a new SOS alert linked to a user |
+| `GET` | `/sos-alert` | Admin endpoint to fetch all SOS alerts |
+| `GET / PUT / DELETE` | `/sos-alert/[id]` | Fetch, update, or delete a specific SOS alert |
+| `GET` | `/sos-alert/user/[userid]` | Fetch SOS history of a specific user including media |
 
 <details>
 <summary>Create SOS example</summary>
@@ -146,6 +151,7 @@ All endpoints are prefixed with `https://rakshak-gamma.vercel.app/api/`
 ```json
 {
   "success": true,
+  "message": "SOS alert created successfully",
   "sos": {
     "id": "6530a1f3b5c7da1a5a2b2cd9",
     "timestamp": "2025-10-25T11:32:56.492Z",
@@ -163,8 +169,7 @@ All endpoints are prefixed with `https://rakshak-gamma.vercel.app/api/`
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/media/upload` | Upload images and/or audio linked to an SOS alert |
-| `GET / DELETE` | `/media/[id]` | Fetch or delete a specific media file (also removes from Cloudinary) |
-| `GET` | `/user/[id]/media` | Fetch all media across a user's SOS alerts *(planned)* |
+| `GET` | `/media/[id]` | Fetch all media linked to a specific SOS alert ID |
 
 **Upload limits:** Images up to **13 MB**, audio up to **15 MB**. Files are stored in Cloudinary under `Rakshak_uploads/images` and `Rakshak_uploads/audio`.
 
@@ -176,8 +181,6 @@ All endpoints are prefixed with `https://rakshak-gamma.vercel.app/api/`
 sosAlertId  — string (required)
 files       — image files (multiple)
 audio       — single audio file (optional)
-title       — string (optional)
-description — string (optional)
 ```
 
 **Response**
@@ -288,20 +291,20 @@ src/
     └── api/
         ├── auth/
         │   ├── signin/
-        │   │   └── route.ts
+        │   │   └── route.ts        # POST sign in user
         │   └── signup/
-        │       └── route.ts
+        │       └── route.ts        # POST register new user
         ├── media/
         │   ├── [id]/
-        │   │   └── route.ts        # GET, DELETE specific media
+        │   │   └── route.ts        # GET media for a specific SOS alert
         │   └── upload/
         │       └── route.ts        # POST upload images/audio
         ├── sos-alert/
         │   ├── [id]/
         │   │   └── route.ts        # GET, PUT, DELETE specific alert
-        │   ├── user/[userId]/
-        │   │   └── route.ts        # GET all alerts for a user
-        │   └── route.ts            # POST create new alert
+        │   ├── user/[userid]/
+        │   │   └── route.ts        # GET all alerts for a specific user
+        │   └── route.ts            # GET all alerts (admin), POST create new alert
         └── user/[id]/
             ├── details/
             │   └── route.ts        # GET, PUT user details
