@@ -314,3 +314,164 @@ src/
             │   └── route.ts        # GET, POST trusted friends
             └── route.ts            # GET, PUT, DELETE user
 ```
+## 🧩 Database Schema
+
+Rakshak uses **Prisma ORM with MongoDB** with ObjectId-based document modeling, explicit foreign-key relations, and cascading deletes.
+
+---
+
+### ⚙️ Design decisions
+
+| Concern | Choice |
+|---|---|
+| Database | MongoDB (NoSQL, document-based) |
+| ORM | Prisma (`@db.ObjectId` for MongoDB compat) |
+| ID strategy | `String @id @default(auto()) @map("_id") @db.ObjectId` |
+| Relations | Manual FK (`@db.ObjectId`) + Prisma `@relation` |
+| Cascading | `onDelete: Cascade` on all dependent models |
+
+---
+
+### 🧑 User
+
+```prisma
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  username    String
+  email       String?  @unique
+  phoneNumber String   @unique
+  password    String
+  createdAt   DateTime @default(now())
+
+  details UserDetails?
+}
+```
+
+- `phoneNumber` is the primary login identifier
+- `email` is optional with sparse unique constraint
+- 1:1 relation owned by `UserDetails` (FK lives there)
+
+---
+
+### 📄 UserDetails
+
+```prisma
+model UserDetails {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String          @unique @db.ObjectId
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  permanentAddress Json?
+  codeWord         String          @default("help")
+  message          String          @default("HELP!!! I am in danger.")
+
+  trustedFriends   TrustedFriend[]
+  sosHistory       SOSAlert[]
+}
+```
+
+- `@unique userId` enforces 1:1 with `User`
+- `Json` used for flexible address structure (lat/lng or full address)
+- Aggregation root for trusted contacts and SOS alerts
+
+---
+
+### 🤝 TrustedFriend
+
+```prisma
+model TrustedFriend {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  userDetailsId String      @db.ObjectId
+  userDetails   UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
+
+  name          String
+  phone         String      @unique
+}
+```
+
+- Many-to-one with `UserDetails`
+- `phone` globally unique — prevents duplicates across users
+
+---
+
+### 🚨 SOSAlert
+
+```prisma
+model SOSAlert {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  userDetailsId String      @db.ObjectId
+  userDetails   UserDetails @relation(fields: [userDetailsId], references: [id], onDelete: Cascade)
+
+  timestamp     DateTime    @default(now())
+  location      Json?
+  status        Status      @default(inactive)
+
+  media         Media[]
+}
+```
+
+- `Json` location allows flexible GPS: `{ lat, lng }`
+- Recommended indexes: `userDetailsId`, `timestamp`
+
+---
+
+### 🗂️ Media
+
+```prisma
+model Media {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  sosAlertId String    @db.ObjectId
+  sosAlert   SOSAlert  @relation(fields: [sosAlertId], references: [id], onDelete: Cascade)
+
+  type       MediaType
+  publicId   String
+  url        String
+  format     String
+
+  duration   Int?
+  width      Int?
+  height     Int?
+
+  uploadedAt DateTime  @default(now())
+}
+```
+
+- Cloudinary integration: `publicId` → asset ref, `url` → delivery URL
+- Optional metadata fields depend on media type
+
+---
+
+### 🔢 Enums
+
+```prisma
+enum MediaType {
+  audio
+  video
+  photo
+}
+
+enum Status {
+  active
+  inactive
+}
+```
+
+---
+
+### 🔗 Relationship summary
+
+| Relation | Type | Implementation |
+|---|---|---|
+| User → UserDetails | 1:1 | `userId @unique` |
+| UserDetails → TrustedFriend | 1:N | FK in TrustedFriend |
+| UserDetails → SOSAlert | 1:N | FK in SOSAlert |
+| SOSAlert → Media | 1:N | FK in Media |
+
+---
+
+### ⚡ Performance considerations
+
+- Index: `phoneNumber`, `userDetailsId`, `sosAlertId`
+- `Json` fields used only where schema flexibility is required
+- Reference-based modeling (no deep nesting)
+- Designed for real-time SOS reads + high-frequency media writes
