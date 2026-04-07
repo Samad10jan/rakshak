@@ -5,7 +5,7 @@ import { corsHeaders } from "@/lib/cors";
 
 //  Preflight request handler
 export async function OPTIONS() {
-  return NextResponse.json({}, { status: 200, headers: corsHeaders });
+    return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
 
 
@@ -64,6 +64,28 @@ export async function POST(
                 { status: 400, headers: corsHeaders }
             );
         }
+        const user = await prisma.user.findUnique({
+            where: { id },
+        });
+
+        if (!user) {
+            return NextResponse.json(
+                { success: false, message: "User not found" },
+                { status: 404, headers: corsHeaders }
+            );
+        }
+
+        // normalize both numbers (VERY IMPORTANT)
+        const normalizedInput = phone.replace(/\D/g, "");
+        const normalizedUserPhone = user.phoneNumber.replace(/\D/g, "");
+
+        // Prevent adding own number
+        if (normalizedInput === normalizedUserPhone) {
+            return NextResponse.json(
+                { success: false, message: "You cannot add your own number as a trusted contact" },
+                { status: 400, headers: corsHeaders }
+            );
+        }
 
         const userDetails = await prisma.userDetails.findUnique({
             where: { userId: id },
@@ -73,6 +95,20 @@ export async function POST(
             return NextResponse.json(
                 { success: false, message: "User details not found" },
                 { status: 404, headers: corsHeaders }
+            );
+        }
+
+        const existing = await prisma.trustedFriend.findFirst({
+            where: {
+                userDetailsId: userDetails.id,
+                phone
+            }
+        });
+
+        if (existing) {
+            return NextResponse.json(
+                { success: false, message: "This number is already in your trusted list" },
+                { status: 400, headers: corsHeaders }
             );
         }
 
