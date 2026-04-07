@@ -225,7 +225,7 @@ export default function SosHistoryPage() {
                                             </div>
 
                                             {/* Location */}
-                                            {sos.status !== "active" &&
+                                            {
                                                 <a href={`https://www.google.com/maps?q=${sos?.location?.lat},${sos?.location?.lng}`}
                                                     target="_blank">
 
