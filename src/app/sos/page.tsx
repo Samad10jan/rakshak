@@ -86,7 +86,7 @@ export default function SosHistoryPage() {
 
             setSosHistory(data.sosHistory);
             setFilteredHistory(data.sosHistory);
-            setUser({ id: userId, username: "", phoneNumber: "", email: "" });
+            setUser({ id: userId, username: "", phoneNumber: "", email: "" } as User);
         } catch (err: any) {
             setError(err.message || "Something went wrong");
         } finally {
