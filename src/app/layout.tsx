@@ -1,21 +1,18 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+
 import Header from "@/components/Header";
+import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Rakshak",
   description: "API MADE IN NEXTjs FOR MY PROJECT :)",
+  openGraph: {
+    title: "Rakshak",
+    description: "API MADE IN NEXTjs FOR MY PROJECT :)",
+    url: "https://rakshak.vercel.app",
+    siteName: "Rakshak",
+  }
 };
 
 export default function RootLayout({
@@ -25,11 +22,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-     
+
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`antialiased font-mono!`}
       >
-         <Header/>
+        <Header />
         {children}
       </body>
     </html>

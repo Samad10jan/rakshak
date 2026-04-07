@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { corsHeaders } from "@/lib/cors";
 
+const trustedFriendsLimit = 10;
 //  Preflight request handler
 export async function OPTIONS() {
     return NextResponse.json({}, { status: 200, headers: corsHeaders });
@@ -89,12 +90,23 @@ export async function POST(
 
         const userDetails = await prisma.userDetails.findUnique({
             where: { userId: id },
+            include: { trustedFriends: true }
         });
 
         if (!userDetails) {
             return NextResponse.json(
                 { success: false, message: "User details not found" },
                 { status: 404, headers: corsHeaders }
+            );
+        }
+
+        if (userDetails.trustedFriends.length >= trustedFriendsLimit) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: `You can only add up to ${trustedFriendsLimit} trusted contacts`,
+                },
+                { status: 400 }
             );
         }
 

@@ -19,5 +19,16 @@ export type User = {
     username: string;
     phoneNumber: string;
     email: string;
+    createdAt: string;
     
 };
+
+export interface ApiEndpoint {
+  path: string;
+  method: string;
+  desc: string;
+  body?: Record<string, any>;
+  response: Record<string, any>;
+  implemented: boolean;
+  errors?: Array<{ status: number; message: string }>;
+}

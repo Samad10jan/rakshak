@@ -9,10 +9,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ApiEndpoint } from "@/lib/types";
 import { useState } from "react";
 
 const API_BASE = "https://rakshak-gamma.vercel.app/api/";
-const ACCESS_CODE = "P20Rakshak";
+
 
 const apiList = [
 
@@ -254,15 +255,7 @@ const apiList = [
 
 ];
 
-interface ApiEndpoint {
-  path: string;
-  method: string;
-  desc: string;
-  body?: Record<string, any>;
-  response: Record<string, any>;
-  implemented: boolean;
-  errors?: Array<{ status: number; message: string }>;
-}
+
 
 const methodColors: Record<string, string> = {
   GET: "bg-green-100 text-green-700",
@@ -362,15 +355,10 @@ function TestApiPanel({ selected }: { selected: ApiEndpoint | null }) {
 }
 
 export default function Home() {
-  const [selected, setSelected] = useState<ApiEndpoint | null>(null);
-  const [code, setCode] = useState("");
-  const [showTestPanel, setShowTestPanel] = useState(false);
 
-  const handleCodeSubmit = () => {
-    if (code === ACCESS_CODE) {
-      setShowTestPanel(true);
-    }
-  };
+
+
+
 
   return (
     <div className="min-h-screen flex bg-amber-100 justify-center py-8 px-3 sm:px-6">
@@ -408,7 +396,7 @@ export default function Home() {
                 className="border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow"
               >
                 <AccordionTrigger
-                  onClick={() => setSelected(api)}
+
                   className="px-2 "
                 >
                   <div className="flex justify-between flex-col md:flex-row w-full ">
@@ -456,29 +444,6 @@ export default function Home() {
           </Accordion>
         </div>
 
-        {/* Access/Test Panel */}
-        <div className="mt-10 flex justify-center">
-          {showTestPanel ? (
-            <div className="w-full sm:w-3/4">
-              <TestApiPanel selected={selected} />
-            </div>
-          ) : (
-            <div className="bg-white/80 border border-gray-200 rounded-xl shadow-lg p-5 w-full max-w-xs flex flex-col items-center gap-3">
-              <h3 className="text-base font-semibold text-gray-700">🔒 Access Test Panel</h3>
-              <Input
-                className="bg-gray-50 border-gray-300 focus:ring-2 focus:ring-blue-400 text-sm"
-                type="password"
-                value={code}
-                maxLength={10}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter Access Code"
-              />
-              <Button onClick={handleCodeSubmit} className="w-full text-sm">
-                Submit
-              </Button>
-            </div>
-          )}
-        </div>
       </main>
     </div>
   );
