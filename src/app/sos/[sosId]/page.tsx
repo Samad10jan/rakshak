@@ -208,6 +208,16 @@ export default function SosAlertPage() {
                   </p>
                 </div>
                 {sos.status === "active" && <Badge className="bg-white text-red-600">URGENT</Badge>}
+
+                {sos.location &&
+                  <a href={`https://www.google.com/maps?q=${sos?.location?.lat},${sos?.location?.lng}`}
+                    target="_blank">
+
+                    <Button size="sm">
+                      <MapPin size={14} /> Open in GoogleMaps
+                    </Button>
+                  </a>
+                  }
               </div>
 
               <div>
@@ -246,14 +256,8 @@ export default function SosAlertPage() {
                       }&layer=mapnik&marker=${sos.location.lat}%2C${sos.location.lng
                       }`}
                   />
-                  {sos.status !== "active" &&
-                    <a href={`https://www.google.com/maps?q=${sos.location.lat},${sos.location.lng}`}
-                      target="_blank">
 
-                      <Button size="sm" variant="outline">
-                        <MapPin size={14} /> Open in GoogleMaps
-                      </Button>
-                    </a>}
+
 
 
                   {/* <div className="bg-linaer text-clip">AA</div> */}
@@ -263,7 +267,7 @@ export default function SosAlertPage() {
 
               {/* Media */}
               <div className="font-bold mb-2 text-center text-rose-700 text-xl">SOS Media</div>
-              
+
               {sos.media.length > 0 && (
                 <div className="flex flex-col gap-4 flex-wrap ring-1 p-3 rounded-4xl">
                   {sos.media
