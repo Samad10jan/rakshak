@@ -209,15 +209,7 @@ export default function SosAlertPage() {
                 </div>
                 {sos.status === "active" && <Badge className="bg-white text-red-600">URGENT</Badge>}
 
-                {sos.location &&
-                  <a href={`https://www.google.com/maps?q=${sos?.location?.lat},${sos?.location?.lng}`}
-                    target="_blank">
 
-                    <Button size="sm">
-                      <MapPin size={14} /> Open in GoogleMaps
-                    </Button>
-                  </a>
-                  }
               </div>
 
               <div>
@@ -244,8 +236,17 @@ export default function SosAlertPage() {
                       <p className="text-xs">Longitude</p>
                       <p>{sos.location.lng}</p>
                     </div>
-                  </div>
+                    {sos.location &&
+                    <a href={`https://www.google.com/maps?q=${sos?.location?.lat},${sos?.location?.lng}`}
+                      target="_blank" >
 
+                      <Button size="sm">
+                        <MapPin size={14} /> Open in GoogleMaps
+                      </Button>
+                    </a>
+                  }
+                  </div>
+                 
                   <iframe
                     title="SOS Alert Location Map"
                     width="100%"
