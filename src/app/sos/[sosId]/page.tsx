@@ -1,17 +1,14 @@
-"use client";
+﻿"use client";
 
 import Error from "@/components/Error";
 import Loading from "@/components/Loading";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sos } from "@/lib/types";
-import { Fullscreen, MapPin, XIcon } from "lucide-react";
+import { Fullscreen, MapPin, X as XIcon } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-
 
 export default function SosAlertPage() {
   const params = useParams();
@@ -22,61 +19,8 @@ export default function SosAlertPage() {
   const [error, setError] = useState<string | null>(null);
   const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState(false);
-
-  /* ---------------- FETCH + POLLING ---------------- */
-
-  // useEffect(() => {
-  //   if (!sosId) return;
-
-  //   // isMounted.current = true;
-  //   setLoading(true);
-
-  //   const getSos = async () => {
-  //     try {
-  //       const res = await fetch(`/api/sos-alert/${sosId}`, {
-  //         cache: "no-store",
-  //       });
-
-  //       const data = await res.json();
-
-  //       if (!res.ok) {
-
-  //         setError(data.message || "Failed to fetch SOS");
-  //         setSos(null);
-
-  //         return;
-  //       }
-
-  //       // if (!isMounted.current) return;
-  //       setSos(data.sos);
-  //       // if (data.sos.status) {
-  //       //   setSos(data.sos);
-  //       //   setError(null);
-  //       // } else {
-  //       //   setSos(null);
-  //       //   setError("This SOS alert is no longer active");
-  //       // }
-  //     } catch (err: any) {
-
-  //       setError(err.message || "Something went wrong");
-  //       setSos(null);
-
-  //     } finally {
-
-  //       setLoading(false);
-
-  //     }
-  //   };
-
-  //   getSos();
-
-  //   const intervalId = setInterval(getSos, 30000);
-
-  //   return () => {
-  //     // isMounted.current = false;
-  //     clearInterval(intervalId);
-  //   };
-  // }, [sosId]);
+  const [message, setMessage] = useState<string | null>(null);
+  const [resolving, setResolving] = useState(false);
 
   useEffect(() => {
     if (!sosId) return;
@@ -91,7 +35,6 @@ export default function SosAlertPage() {
           setSos(null);
           return;
         }
-        // console.log("not interval");
 
         setSos(data.sos);
         setError(null);
@@ -107,23 +50,23 @@ export default function SosAlertPage() {
     getSos();
   }, [sosId]);
 
-  // separate effect for polling
   useEffect(() => {
     if (sos?.status !== "active") return;
 
-    const intervalId = setInterval(() => {
-      // console.log("intrrval");
-
-      fetch(`/api/sos-alert/${sos.id}`, { cache: "no-store" })
-        .then(res => res.json())
-        .then(data => setSos(data.sos))
-        .catch(err => setError(err.message || "Something went wrong"));
-    }, 20 * 1000);
+    const intervalId = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/sos-alert/${sos.id}`, { cache: "no-store" });
+        const data = await res.json();
+        if (res.ok) {
+          setSos(data.sos);
+        }
+      } catch (err: any) {
+        console.error(err.message || "Polling error");
+      }
+    }, 20000);
 
     return () => clearInterval(intervalId);
   }, [sos]);
-
-  /* ---------------- ESC CLOSE ---------------- */
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -131,24 +74,17 @@ export default function SosAlertPage() {
         setFullScreenImage(null);
       }
     };
+
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, []);
 
-  /* ---------------- STATUS COLOR ---------------- */
-
-  const getStatusColor = (status: string) =>
-    status === "active"
-      ? "bg-red-500 animate-pulse"
-      : "bg-gray-500";
-
-  /* ---------------- COPY ---------------- */
+  const getStatusLabel = (status: string) =>
+    status === "active" ? "bg-rose-500/90" : "bg-slate-600/90";
 
   const copyToClipboard = async (text: string) => {
     try {
-
       await navigator.clipboard.writeText(text);
-
       setCopiedId(true);
       setTimeout(() => setCopiedId(false), 2000);
     } catch {
@@ -156,161 +92,176 @@ export default function SosAlertPage() {
     }
   };
 
+  const resolveAlert = async () => {
+    if (!sos) return;
+    setResolving(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch(`/api/sos-alert/${sos.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "inactive" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessage(data.message || "Unable to update alert.");
+        return;
+      }
+      setSos(data.sos);
+      setMessage("Alert resolved successfully.");
+    } catch (err: any) {
+      setMessage(err.message || "Something went wrong.");
+    } finally {
+      setResolving(false);
+    }
+  };
 
   if (loading) return <Loading />;
-
   if (error) return <Error error={error} />;
-
   if (!sos) return null;
 
-
   return (
-    <>
+    <div className="min-h-screen bg-slate-950/95 px-4 py-8 sm:px-6 lg:px-10">
       {fullScreenImage && (
-        <div
-          className="fixed inset-0 z-55 bg-black/70 flex items-center justify-center p-3 sm:p-6"
-          onClick={() => setFullScreenImage(null)}
-        >
-          <div
-            className="relative w-full max-w-xl h-[75vh] sm:h-[85vh] bg-neutral-700"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={fullScreenImage}
-              alt="Fullscreen image"
-              fill
-              className="object-contain"
-              sizes="100vw"
-              priority
-            />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4">
+          <div className="relative mx-auto h-[80vh] w-full max-w-4xl overflow-hidden rounded-3xl bg-slate-900 shadow-2xl">
+            <Image src={fullScreenImage} alt="Fullscreen media" fill className="object-contain" sizes="100vw" priority />
           </div>
-          <Button onClick={() => setFullScreenImage(null)} className="rounded-full hover:bg-red-500 text-white absolute top-0 right-0 m-5 text-center ring-2 active:bg-red-500 ring-red-500 transtion-all duration-300"><XIcon /></Button>
-
+          <button title="btn" className="absolute right-5 top-5 rounded-full bg-white/10 px-3 py-2 text-white transition hover:bg-white/20" onClick={() => setFullScreenImage(null)}>
+            <XIcon size={20} />
+          </button>
         </div>
       )}
 
-      <div className="min-h-screen pt-3 bg-amber-100" >
-        <div className="max-w-5xl mx-auto">
-          <Card>
-            <CardContent className=" pt-2 space-y-6">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <section className="rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-2xl shadow-black/30">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-pink-300">SOS Alert</p>
+              <h1 className="mt-2 text-3xl font-semibold text-white">Alert ID {sos.id}</h1>
+              <p className="mt-2 text-sm text-slate-400">Raised on {new Date(sos.timestamp).toLocaleString()}</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button variant="outline" onClick={() => copyToClipboard(sos.id)}>
+                {copiedId ? "Copied" : "Copy Alert ID"}
+              </Button>
+              {sos.status === "active" ? (
+                <Button onClick={resolveAlert} disabled={resolving}>
+                  {resolving ? "Resolving..." : "Mark as Resolved"}
+                </Button>
+              ) : (
+                <span className="rounded-full bg-slate-700 px-4 py-2 text-sm text-slate-200">Resolved</span>
+              )}
+            </div>
+          </div>
 
-              <div
-                className={`${getStatusColor(
-                  sos.status
-                )} text-white px-3 py-2 rounded-lg flex justify-between`}
-              >
-                <div>
-                  <p className="font-bold text-lg">
-                    {sos.status.toUpperCase()} ALERT
+          {message && <p className="mt-4 rounded-3xl bg-white/10 px-4 py-3 text-sm text-slate-100">{message}</p>}
+
+          <div className="mt-6 grid gap-6 xl:grid-cols-2">
+            <Card className="rounded-3xl border border-white/10 bg-slate-950/80 p-6">
+              <CardContent className="p-0">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg font-semibold text-white">Status and location</h2>
+                  <span className={`rounded-full px-3 py-1 text-sm font-semibold text-white ${getStatusLabel(sos.status)}`}>
+                    {sos.status.toUpperCase()}
+                  </span>
+                </div>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Latitude</p>
+                    <p className="mt-2 text-base text-slate-200">{sos.location?.lat ?? "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Longitude</p>
+                    <p className="mt-2 text-base text-slate-200">{sos.location?.lng ?? "N/A"}</p>
+                  </div>
+                </div>
+                {sos.location && (
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <a
+                      href={`https://www.google.com/maps?q=${sos.location.lat},${sos.location.lng}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition hover:bg-pink-600/90"
+                    >
+                      <MapPin size={16} /> Open in Google Maps
+                    </a>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-3xl border border-white/10 bg-slate-950/80 p-6">
+              <CardContent className="p-0">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg font-semibold text-white">User emergency info</h2>
+                </div>
+                <div className="mt-5 space-y-3 text-sm text-slate-300">
+                  <p>
+                    <span className="font-semibold text-white">Code word:</span>{' '}
+                    {(sos as any).userDetails?.codeWord ?? "Not available"}
                   </p>
-                  <p className="text-sm">
-                    {new Date(sos.timestamp).toLocaleString()}
+                  <p>
+                    <span className="font-semibold text-white">Alert message:</span>{' '}
+                    {(sos as any).userDetails?.message ?? "Not available"}
+                  </p>
+                  <p>
+                    <span className="font-semibold text-white">Saved address:</span>{' '}
+                    {(sos as any).userDetails?.permanentAddress ? `${(sos as any).userDetails.permanentAddress.lat}, ${(sos as any).userDetails.permanentAddress.lng}` : "None"}
                   </p>
                 </div>
-                {sos.status === "active" && <Badge className="bg-white text-red-600">URGENT</Badge>}
+              </CardContent>
+            </Card>
+          </div>
 
-
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">Alert ID</p>
-                <p className="font-mono break-all">{sos.id}</p>
-                <Button
-                  size="sm"
-                  onClick={() => copyToClipboard(sos.id)}
-                >
-                  {copiedId ? "Copied" : "Copy"}
-                </Button>
-              </div>
-
-              {sos.location && (
-                <div className="space-y-4">
-                  <h3 className="font-bold text-lg">Location</h3>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-xs">Latitude</p>
-                      <p>{sos.location.lat}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs">Longitude</p>
-                      <p>{sos.location.lng}</p>
-                    </div>
-                    {sos.location &&
-                    <a href={`https://www.google.com/maps?q=${sos?.location?.lat},${sos?.location?.lng}`}
-                      target="_blank" >
-
-                      <Button size="sm">
-                        <MapPin size={14} /> Open in GoogleMaps
-                      </Button>
-                    </a>
-                  }
-                  </div>
-                 
+          {sos.location && (
+            <Card className="rounded-3xl border border-white/10 bg-slate-950/80 p-6">
+              <CardContent className="p-0">
+                <h2 className="text-lg font-semibold text-white">Map preview</h2>
+                <div className="mt-5 overflow-hidden rounded-3xl border border-white/10">
                   <iframe
                     title="SOS Alert Location Map"
                     width="100%"
-                    height="300"
-                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${sos.location.lng - 0.01
-                      }%2C${sos.location.lat - 0.01}%2C${sos.location.lng + 0.01
-                      }%2C${sos.location.lat + 0.01
-                      }&layer=mapnik&marker=${sos.location.lat}%2C${sos.location.lng
-                      }`}
+                    height="340"
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${sos.location.lng - 0.011}%2C${sos.location.lat - 0.011}%2C${sos.location.lng + 0.011}%2C${sos.location.lat + 0.011}&layer=mapnik&marker=${sos.location.lat}%2C${sos.location.lng}`}
                   />
-
-
-
-
-                  {/* <div className="bg-linaer text-clip">AA</div> */}
                 </div>
-              )}
+              </CardContent>
+            </Card>
+          )}
 
-
-              {/* Media */}
-              <div className="font-bold mb-2 text-center text-rose-700 text-xl">SOS Media</div>
-
-              {sos.media.length > 0 && (
-                <div className="flex flex-col gap-4 flex-wrap ring-1 p-3 rounded-4xl">
-                  {sos.media
-                    .slice() // make a copy so we don’t mutate original
-
-                    .sort((a, b) => {
-                      // photos first, then audio
-                      if (a.type === "photo" && b.type === "audio") return -1;
-                      if (a.type === "audio" && b.type === "photo") return 1;
-                      return 0;
-                    })
-                    .map((m) => (
-                      <div key={m.id}>
-                        {m.type === "photo" && (
-                          <div
-                            className="group relative w-full h-38 sm:h-56 md:h-64 rounded-lg overflow-hidden cursor-pointer"
-                            onClick={() => setFullScreenImage(m.url)}
-                          >
-                            <Image
-                              src={m.url}
-                              alt="SOS photo"
-                              fill
-                              className="object-cover hover:scale-105 transition-transform duration-300"
-                              sizes="(max-width: 640px) 100vw, 50vw"
-                            />
-                            <div className="opacity-0 flex justify-center items-center group-hover:opacity-100 absolute inset-0 w-full z-10 bg-black/50 rounded-2xl p-1 transition-opacity duration-700">
-                              <Fullscreen color="white" />
-                            </div>
-                          </div>
-                        )}
-
-                        {m.type === "audio" && (
-                          <audio src={m.url} controls className="w-full" />
-                        )}
-                      </div>
-                    ))}
-                </div>
-              )}
+          <Card className="rounded-3xl border border-white/10 bg-slate-950/80 p-6">
+            <CardContent className="p-0">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold text-white">SOS Media</h2>
+                <span className="text-sm text-slate-400">{sos.media.length} items</span>
+              </div>
+              <div className="mt-5 grid gap-4">
+                {sos.media.length === 0 ? (
+                  <div className="rounded-3xl bg-slate-900/80 p-8 text-center text-slate-500">No media attached to this alert.</div>
+                ) : (
+                  sos.media.slice().map((m) => (
+                    <div key={m.id} className="rounded-3xl border border-white/10 bg-slate-900/80 p-4">
+                      {m.type === "photo" ? (
+                        <div className="group relative aspect-[16/10] overflow-hidden rounded-3xl bg-slate-800">
+                          <Image src={m.url} alt="SOS photo" fill className="object-cover transition duration-300 group-hover:scale-105" sizes="100vw" />
+                          <button title="btn" className="absolute right-3 top-3 rounded-full bg-white/10 px-3 py-2 text-white shadow-lg" onClick={() => setFullScreenImage(m.url)}>
+                            <Fullscreen size={18} />
+                          </button>
+                        </div>
+                      ) : (
+                        <audio src={m.url} controls className="w-full rounded-3xl bg-slate-950/80 p-3" />
+                      )}
+                      <p className="mt-3 text-sm text-slate-400">Type: {m.type}</p>
+                    </div>
+                  ))
+                )}
+              </div>
             </CardContent>
           </Card>
-        </div>
-      </div >
-    </>
+        </section>
+      </div>
+    </div>
   );
 }

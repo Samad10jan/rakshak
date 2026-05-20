@@ -1,6 +1,5 @@
-"use client";
+﻿"use client";
 
-import DateFilter from "@/components/DateFilter";
 import Error from "@/components/Error";
 import Loading from "@/components/Loading";
 import { Badge } from "@/components/ui/badge";
@@ -8,286 +7,252 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getUserIdFromCookie } from "@/lib/context";
 import { Sos, User } from "@/lib/types";
-import { ArrowRight, Clock, Fullscreen, MapPin, Minimize, TouchpadIcon, XIcon } from "lucide-react";
+import { ArrowRight, MapPin, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function SosHistoryPage() {
-    const [sosHistory, setSosHistory] = useState<Sos[]>([]);
-    const [filteredHistory, setFilteredHistory] = useState<Sos[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [user, setUser] = useState<User | null>(null);
-    const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
-    const router = useRouter();
-    const [copiedId, setCopiedId] = useState(false);
+  const [sosHistory, setSosHistory] = useState<Sos[]>([]);
+  const [filteredHistory, setFilteredHistory] = useState<Sos[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState(false);
+  const [dateFilter, setDateFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
-
-    /* ---------------- INITIAL LOAD ---------------- */
-
-    useEffect(() => {
-
-        async function getData() {
-            try {
-                const userId = await getUserIdFromCookie()
-                if (userId) {
-                    fetchSosHistory(userId);
-                } else {
-                    setUser(null)
-                    setLoading(false);
-                }
-
-            } catch (err: any) {
-                console.log(err.message);
-
-                setLoading(false)
-
-            }
-
+  useEffect(() => {
+    async function getData() {
+      try {
+        const userId = await getUserIdFromCookie();
+        if (userId) {
+          fetchSosHistory(userId);
+        } else {
+          setUser(null);
+          setLoading(false);
         }
-        getData()
-    }, []);
+      } catch (err: any) {
+        console.error(err.message);
+        setLoading(false);
+      }
+    }
 
-    useEffect(() => {
-        if (!loading && !user) {
-            router.replace("/login");
-        }
-    }, [loading, user, router]);
+    getData();
+  }, []);
 
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [loading, user, router]);
 
-    /* ---------------- ESC CLOSE FULLSCREEN ---------------- */
+  useEffect(() => {
+    let next = [...sosHistory];
 
-    useEffect(() => {
-        const handleEscape = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                setFullScreenImage(null);
-            }
-        };
+    if (dateFilter) {
+      next = next.filter((sos) => new Date(sos.timestamp).toISOString().split("T")[0] === dateFilter);
+    }
 
-        window.addEventListener("keydown", handleEscape);
-        return () => window.removeEventListener("keydown", handleEscape);
-    }, []);
+    if (statusFilter !== "all") {
+      next = next.filter((sos) => sos.status === statusFilter);
+    }
 
-    /* ---------------- FETCH ---------------- */
+    if (searchQuery.trim()) {
+      next = next.filter((sos) => sos.id.includes(searchQuery.trim()));
+    }
 
-    const fetchSosHistory = async (userId: string) => {
-        try {
-            setLoading(true);
+    setFilteredHistory(next);
+  }, [dateFilter, searchQuery, statusFilter, sosHistory]);
 
-            const res = await fetch(`/api/sos-alert/user/${userId}`);
-            const data = await res.json();
+  const fetchSosHistory = async (userId: string) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/sos-alert/user/${userId}`);
+      const data = await res.json();
 
-            if (!res.ok) {
-                setError(data.message || "Failed to fetch SOS history");
-                return;
-            }
+      if (!res.ok) {
+        setError(data.message || "Failed to fetch SOS history");
+        return;
+      }
 
-            setSosHistory(data.sosHistory);
-            setFilteredHistory(data.sosHistory);
-            setUser({ id: userId, username: "", phoneNumber: "", email: "" } as User);
-        } catch (err: any) {
-            setError(err.message || "Something went wrong");
-        } finally {
-            setLoading(false);
-        }
-    };
+      setSosHistory(data.sosHistory);
+      setFilteredHistory(data.sosHistory);
+      setUser({ id: userId, username: "", phoneNumber: "", email: "" } as User);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const statistics = useMemo(
+    () => ({
+      total: sosHistory.length,
+      active: sosHistory.filter((item) => item.status === "active").length,
+      resolved: sosHistory.filter((item) => item.status !== "active").length,
+    }),
+    [sosHistory]
+  );
 
-    const handleDateFilter = useCallback(
-        (date: string | null) => {
-            if (!date) {
-                setFilteredHistory(sosHistory);
-                return;
-            }
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    } catch {
+      console.error("Failed to copy");
+    }
+  };
 
-            const filtered = sosHistory.filter((sos) => {
-                const sosDate = new Date(sos.timestamp)
-                    .toISOString()
-                    .split("T")[0];
+  if (loading) return <Loading />;
+  if (error) return <Error error={error} />;
+  if (!user) return null;
 
-                return sosDate === date;
-            });
+  return (
+    <div className="min-h-screen bg-slate-950/95 px-4 py-8 sm:px-6 lg:px-10">
+      {fullScreenImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
+          <div className="relative mx-auto h-[80vh] w-full max-w-4xl overflow-hidden rounded-3xl bg-slate-900 shadow-2xl">
+            <Image src={fullScreenImage} alt="Fullscreen media" fill className="object-contain" sizes="100vw" priority />
+          </div>
+          <button className="absolute right-5 top-5 rounded-full bg-white/10 px-3 py-2 text-white transition hover:bg-white/20" onClick={() => setFullScreenImage(null)}>
+            Close
+          </button>
+        </div>
+      )}
 
-            setFilteredHistory(filtered);
-        },
-        [sosHistory]
-    );
-
-    /* ---------------- COPY ---------------- */
-
-    const copyToClipboard = async (text: string) => {
-        try {
-
-            await navigator.clipboard.writeText(text);
-
-            setCopiedId(true);
-            setTimeout(() => setCopiedId(false), 2000);
-        } catch {
-            console.error("Failed to copy");
-        }
-    };
-
-    /* ---------------- STATES ---------------- */
-
-    if (loading) return <Loading />;
-    if (error) return <Error error={error} />;
-    if (!user) return null;
-
-    if (sosHistory.length === 0)
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <p className="text-gray-500 text-lg">No SOS history found.</p>
+      <div className="mx-auto max-w-6xl space-y-6">
+        <section className="rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-xl shadow-pink-500/10">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-pink-300">SOS History</p>
+              <h1 className="mt-2 text-3xl font-semibold text-white">Emergency alerts & media</h1>
+              <p className="mt-2 text-sm text-slate-400">Review your alerts, copy IDs, and open details instantly.</p>
             </div>
-        );
+            <div className="grid gap-3 sm:grid-cols-3">
+              <StatCard label="Total" value={statistics.total} />
+              <StatCard label="Active" value={statistics.active} />
+              <StatCard label="Resolved" value={statistics.resolved} />
+            </div>
+          </div>
+        </section>
 
-    /* ---------------- MAIN UI ---------------- */
-
-    return (
-        <>
-            {/* Fullscreen Modal */}
-            {fullScreenImage && (
-                <div
-                    className="fixed inset-0 z-55 bg-black/95 flex items-center justify-center p-3 sm:p-6"
-                    onClick={() => setFullScreenImage(null)}
+        <section className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
+          <div className="space-y-4 rounded-3xl border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/20">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="sm:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-slate-300">Search alerts</label>
+                <div className="flex gap-2">
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by alert ID"
+                    className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
+                  />
+                  <Button variant="outline" className="px-4 py-3">
+                    <Search size={16} />
+                  </Button>
+                </div>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-300">Status filter</label>
+                <select
+                title="date"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-white outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
                 >
-                    <div
-                        className="relative w-full max-w-xl h-[75vh] sm:h-[85vh] bg-neutral-800"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <Image
-                            src={fullScreenImage}
-                            alt="Fullscreen image"
-                            fill
-                            className="object-contain"
-                            sizes="100vw"
-                            priority
-                        />
-                    </div>
-                    <Button onClick={() => setFullScreenImage(null)} className="rounded-full hover:bg-red-500 text-white absolute top-0 right-0 m-5 text-center ring-2 active:bg-red-500 ring-red-500 transtion-all duration-300"><Minimize /></Button>
-
-                </div>
-            )}
-
-            <div className="min-h-screen bg-amber-100 px-3 sm:px-6 lg:px-10 py-6">
-                <div className="max-w-6xl mx-auto">
-
-                    {/* Heading */}
-                    <div className=" flex justify-center items-center gap-4 text-xl md:text-4xl mb-8 mt-2">
-
-                        <Clock color="red" size={40} /> Your SOS History
-
-                    </div>
-
-                    {/* Date Filter */}
-                    <div className="sticky top-10 *:bg-white z-51 w-fit mx-auto">
-                        <DateFilter onFilter={handleDateFilter} />
-                    </div>
-
-
-
-                    <div className="h-full pr-2 sm:pr-4">
-                        <div className="space-y-4 sm:space-y-6">
-                            {filteredHistory.map((sos) => (
-                                <Card key={sos.id} className="shadow-lg relative">
-                                    <Link href={`/sos/${sos.id}`} className=" absolute top-2 right-5 rounded-full text-xs *:size-5 md:*:size-auto" title="sos page"><Button ><ArrowRight /></Button></Link>
-                                    <CardContent className="p-4 sm:p-6">
-
-                                        <Badge
-                                            variant={sos.status !== "active" ? "secondary" : "destructive"}
-                                            className=" w-fit absolute top-2 left-2 "
-                                        >
-                                            {sos.status.toUpperCase()}
-                                        </Badge>
-
-                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                            <div className="">
-                                                <p className="text-sm text-gray-500">Alert ID</p>
-                                                <p className="font-mono break-keep text-xs md:text-base">{sos.id}</p>
-                                                <Button
-
-                                                    onClick={() => copyToClipboard(sos.id)}
-                                                    className="font-mono rounded-full text-xs size-5 md:size-auto  "
-                                                >
-                                                    {copiedId ? "Copied" : "Copy"}
-                                                </Button>
-                                            </div>
-
-
-                                        </div>
-
-
-                                        <div className=" flex justify-between flex-wrap">
-                                            <div className="text-sm sm:text-base mb-3">
-                                                <p className="font-bold">Last Active Time:</p>
-                                                {new Date(sos.timestamp).toLocaleString()}
-                                            </div>
-
-                                            {/* Location */}
-                                            {
-                                                <a href={`https://www.google.com/maps?q=${sos?.location?.lat},${sos?.location?.lng}`}
-                                                    target="_blank">
-
-                                                    <Button size="sm" variant="outline" className="text-xs md:text-base mb-3">
-                                                        <MapPin size={14} /> Open in GoogleMaps
-                                                    </Button>
-                                                </a>}
-                                        </div>
-
-                                        {/* Media */}
-                                        {sos.media.length > 0 && (
-                                            <div>
-                                                <div className="font-bold mb-2 text-center text-rose-700 text-xl">SOS Media</div>
-
-                                                <div className="flex flex-col gap-4 flex-wrap ring-1 p-3 rounded-4xl">
-                                                    {sos.media
-                                                        .slice() // make a copy so we don’t mutate original
-
-                                                        .sort((a, b) => {
-                                                            // photos first, then audio
-                                                            if (a.type === "photo" && b.type === "audio") return -1;
-                                                            if (a.type === "audio" && b.type === "photo") return 1;
-                                                            return 0;
-                                                        })
-                                                        .map((m) => (
-                                                            <div key={m.id}>
-                                                                {m.type === "photo" && (
-                                                                    <div
-                                                                        className="group relative w-full h-38 sm:h-56 md:h-64 rounded-lg overflow-hidden cursor-pointer"
-                                                                        onClick={() => setFullScreenImage(m.url)}
-                                                                    >
-                                                                        <Image
-                                                                            src={m.url}
-                                                                            alt="SOS photo"
-                                                                            fill
-                                                                            className="object-cover hover:scale-105 transition-transform duration-300"
-                                                                            sizes="(max-width: 640px) 100vw, 50vw"
-                                                                        />
-                                                                        <div className="opacity-0 flex justify-center items-center group-hover:opacity-100 absolute inset-0 w-full z-10 bg-black/50 rounded-2xl p-1 transition-opacity duration-700">
-                                                                            <Fullscreen color="white" />
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-
-                                                                {m.type === "audio" && (
-                                                                    <audio src={m.url} controls className="w-full" />
-                                                                )}
-                                                            </div>
-                                                        ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
-
-
-                </div>
+                  <option value="all">All</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Resolved</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-300">Filter by date</label>
+                <input
+                title="date"
+                  type="date"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="w-full rounded-2xl border border-slate-700 bg-white px-4 py-3 text-sm outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20"
+                />
+              </div>
             </div>
-        </>
-    );
+
+            {filteredHistory.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-white/10 bg-slate-950/70 p-8 text-center text-slate-400">
+                No SOS alerts match the selected filters.
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredHistory.map((sos) => (
+                  <Card key={sos.id} className="rounded-3xl border border-white/10 bg-slate-950/80 shadow-lg shadow-slate-900/20">
+                    <CardContent className="space-y-4 p-5">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-sm uppercase tracking-[0.3em] text-pink-300">Alert ID</p>
+                          <p className="mt-2 font-mono text-base text-white break-all">{sos.id}</p>
+                          <p className="mt-1 text-sm text-slate-400">{new Date(sos.timestamp).toLocaleString()}</p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge variant={sos.status === "active" ? "destructive" : "secondary"}>{sos.status.toUpperCase()}</Badge>
+                          <Link href={`/sos/${sos.id}`} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition hover:bg-pink-600/90">
+                            Details <ArrowRight size={16} />
+                          </Link>
+                        </div>
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-4">
+                          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Location</p>
+                          <p className="mt-2 text-sm text-slate-200">{sos.location?.lat?.toFixed(5) ?? "—"}, {sos.location?.lng?.toFixed(5) ?? "—"}</p>
+                        </div>
+                        <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-4">
+                          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Media items</p>
+                          <p className="mt-2 text-sm text-slate-200">{sos.media.length}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <aside className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 shadow-xl shadow-slate-900/20">
+            <p className="text-sm uppercase tracking-[0.3em] text-pink-300">Quick tips</p>
+            <div className="mt-5 space-y-4 text-sm text-slate-300">
+              <div className="rounded-3xl bg-slate-950/80 p-4">
+                <p className="font-semibold text-white">Saved search</p>
+                <p className="mt-2 text-slate-400">Use partial alert IDs or filter status to find incidents faster.</p>
+              </div>
+              <div className="rounded-3xl bg-slate-950/80 p-4">
+                <p className="font-semibold text-white">Resolve alerts</p>
+                <p className="mt-2 text-slate-400">Open an alert to mark it resolved when the situation is safe.</p>
+              </div>
+              <div className="rounded-3xl bg-slate-950/80 p-4">
+                <p className="font-semibold text-white">Location detail</p>
+                <p className="mt-2 text-slate-400">Every alert includes the coordinates and quick map access.</p>
+              </div>
+            </div>
+          </aside>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-3xl border border-white/10 bg-slate-950/90 p-4 text-center">
+      <p className="text-xs uppercase tracking-[0.3em] text-slate-400">{label}</p>
+      <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
+    </div>
+  );
 }

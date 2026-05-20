@@ -1,88 +1,91 @@
-"use client"
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 export default function Login() {
-    const [loginLoading, setLoginLoading] = useState(false);
-    const [loginError, setLoginError] = useState<string | null>(null);
-    const [formData, setFormData] = useState({ phoneNumber: "", password: "" });
-    const router= useRouter()
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({ phoneNumber: "", password: "" });
+  const router = useRouter();
 
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    setLoginError(null);
 
-    /* ---------------- LOGIN ---------------- */
+    try {
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoginLoading(true);
-        setLoginError(null);
+      const data = await res.json();
 
-        try {
-            const res = await fetch("/api/auth/signin", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
+      if (!res.ok) {
+        setLoginError(data.message || "Login failed");
+        return;
+      }
 
-            const data = await res.json();
+      router.push("/sos");
+    } catch (err: any) {
+      setLoginError(err.message || "Something went wrong");
+    } finally {
+      setLoginLoading(false);
+    }
+  };
 
-            if (!res.ok) {
-                setLoginError(data.message || "Login failed");
-                return;
-            }
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),transparent_55%)] from-slate-900 via-slate-950 to-[#100b1b] px-4 py-8">
+      <Card className="w-full max-w-md border border-white/10 bg-slate-950/80 shadow-2xl shadow-fuchsia-700/10">
+        <CardContent className="p-8">
+          <div className="mb-8 text-center">
+            <p className="text-sm uppercase tracking-[0.3em] text-pink-300">Welcome back</p>
+            <h1 className="mt-3 text-3xl font-semibold text-white">Sign in to your dashboard</h1>
+          </div>
 
-            router.push("/sos")
-           
-           
-        } catch (err: any) {
-            setLoginError(err.message || "Something went wrong");
-        } finally {
-            setLoginLoading(false);
-        }
-    };
-    return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-            <Card className="w-full max-w-md shadow-xl">
-                <CardContent className="p-8">
-                    <h2 className="text-2xl font-bold text-center mb-6">
-                        Login to View SOS History
-                    </h2>
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="mb-2 block text-sm text-slate-300">Phone Number</label>
+              <Input
+                type="tel"
+                placeholder="Enter your phone number"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm text-slate-300">Password</label>
+              <Input
+                type="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+              />
+            </div>
 
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <input
-                            type="tel"
-                            placeholder="Phone Number"
-                            className="w-full border rounded-lg px-4 py-3"
-                            value={formData.phoneNumber}
-                            onChange={(e) =>
-                                setFormData({ ...formData, phoneNumber: e.target.value })
-                            }
-                            required
-                        />
+            {loginError && <p className="text-sm text-red-400">{loginError}</p>}
 
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            className="w-full border rounded-lg px-4 py-3"
-                            value={formData.password}
-                            onChange={(e) =>
-                                setFormData({ ...formData, password: e.target.value })
-                            }
-                            required
-                        />
+            <Button className="w-full py-3" type="submit">
+              {loginLoading ? "Logging in..." : "Login"}
+            </Button>
+          </form>
 
-                        {loginError && (
-                            <div className="text-red-600 text-sm">{loginError}</div>
-                        )}
-
-                        <Button className="w-full">
-                            {loginLoading ? "Logging in..." : "Login"}
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
-    );
-
+          <div className="mt-6 text-center text-sm text-slate-400">
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="font-medium text-pink-300 hover:text-pink-200">
+              Create one now.
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
