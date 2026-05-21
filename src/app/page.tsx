@@ -46,8 +46,8 @@ export default function RakshakHomepage() {
 
           {/* Headline */}
           <h1 className="mb-5 sm:mb-6 max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight text-white">
-           <span className="text-red-400 ">Rakshak </span> Keeps You{" "}
-            <span className="text-pink-400">Safe</span>
+           Your <span className="text-red-400 ">Safety, </span> Our{" "}
+            <span className="text-pink-400">Priority</span>
           </h1>
 
           {/* Subtext */}

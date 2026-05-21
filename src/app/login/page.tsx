@@ -46,7 +46,7 @@ export default function Login() {
               Welcome back
             </p>
             <h1 className="mt-1.5 text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white">
-              Sign in to Rakshak
+              Sign in to Rakshak Dashboard
             </h1>
             <p className="mt-1 text-xs sm:text-sm text-slate-500">
               Enter your credentials to access your dashboard.
