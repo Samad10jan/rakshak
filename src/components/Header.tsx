@@ -13,7 +13,7 @@ export default async function Header() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 sm:gap-3 shrink-0 group">
-            <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border border-pink-500/50 shadow-[0_0_12px_rgba(236,72,153,0.3)] group-hover:shadow-[0_0_18px_rgba(236,72,153,0.5)] transition-shadow duration-300">
+            <div className="relative w-8 h-8 sm:w-9 sm:h-9  transition-shadow duration-300">
               <Image
                 src="/rakshak.png"
                 alt="Rakshak Logo"
@@ -25,9 +25,6 @@ export default async function Header() {
             <div className="leading-tight">
               <p className="text-sm sm:text-base md:text-lg font-semibold text-pink-400 group-hover:text-pink-300 transition-colors duration-200">
                 Rakshak
-              </p>
-              <p className="hidden xs:block text-[9px] sm:text-[10px] uppercase tracking-[0.25em] sm:tracking-[0.3em] text-white/50">
-                Safety alerts made simple
               </p>
             </div>
           </Link>
@@ -52,7 +49,7 @@ export default async function Header() {
                   <LogIn size={14} />
                   <span className="hidden sm:inline">Login</span>
                 </Link>
-                <NavLink href="/signup" icon={<PlusCircle size={15} />} label="Sign Up" />
+
               </>
             )}
           </div>
