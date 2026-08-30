@@ -207,7 +207,7 @@ audio       — single audio file (optional)
 
 | Page | Preview |
 |---|---|
-| Landing Page | ![Landing](https://github.com/user-attachments/assets/03444523-aa7e-4803-a476-27631e9d8e53) |
+| Landing Page | ![Landing](https://github.com/user-attachments/assets/b631a82e-7cd4-4b1f-8d56-0e925255326b)|
 | SOS History (with date filter) | ![SOS History](https://github.com/user-attachments/assets/4d2f6aad-cf43-4cf0-b5c5-e606cf8ebad0) |
 | Active SOS Alert | ![Active SOS](https://github.com/user-attachments/assets/d38c7f80-2b6c-43d2-983d-8bcabd162079) |
 | Individual SOS Page | ![SOS Media](https://github.com/user-attachments/assets/b27232b3-813e-4ebe-9193-b1bdd4be0e51) |
